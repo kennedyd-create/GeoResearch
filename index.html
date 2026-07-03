@@ -1,0 +1,1971 @@
+<!DOCTYPE html>
+<html lang="en-NZ" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoResearch Student Hub (Level 2 & 3)</title>
+    <!-- External Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        /* Dynamic Theme Variables */
+        body[data-level="3"] {
+            --geo-primary: #2563eb; 
+            --geo-primary-hover: #1d4ed8;
+            --geo-dark: #1e3a8a; 
+            --geo-light: #eff6ff; 
+            --geo-border: #bfdbfe;
+            --geo-gradient: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+        }
+        body[data-level="2"] {
+            --geo-primary: #0d9488; 
+            --geo-primary-hover: #0f766e;
+            --geo-dark: #134e4a; 
+            --geo-light: #f0fdfa; 
+            --geo-border: #99f6e4;
+            --geo-gradient: linear-gradient(135deg, #0f172a 0%, #134e4a 100%);
+        }
+        
+        :root { 
+            --geo-accent: #f8fafc; 
+            --geo-gold: #fbbf24; 
+            --geo-green: #10b981;
+            --geo-purple: #7c3aed;
+            --geo-dark-blue: #1e40af;
+        }
+        
+        body { 
+            font-family: 'Manrope', sans-serif; 
+            background-color: var(--geo-accent); 
+            color: #1e293b; 
+            overflow-x: hidden; 
+            transition: background-color 0.3s ease; 
+        }
+        
+        /* Level Display Logic */
+        body[data-level="2"] .l3-only { display: none !important; }
+        body[data-level="3"] .l2-only { display: none !important; }
+
+        /* Base Components */
+        .glass-card { background: white; border: 1px solid #e2e8f0; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.5rem; }
+        .theme-bg { background-color: var(--geo-primary); color: white; }
+        .theme-bg:hover { background-color: var(--geo-primary-hover); }
+        .theme-border-t { border-top: 4px solid var(--geo-primary); }
+        .theme-text { color: var(--geo-primary); }
+        
+        /* Main Navigation */
+        .nav-btn { padding: 0.75rem 1.25rem; color: #64748b; font-weight: 700; border-bottom: 3px solid transparent; transition: all 0.2s ease; white-space: nowrap; cursor: pointer; }
+        .nav-btn:hover:not(.nav-nzqa) { color: var(--geo-primary); }
+        .nav-btn.active:not(.nav-nzqa) { border-bottom-color: var(--geo-primary); color: var(--geo-primary); background-color: var(--geo-light); border-radius: 0.5rem 0.5rem 0 0; }
+        
+        .nav-nzqa { background-color: #cbd5e1; color: #334155; border-radius: 0.5rem 0.5rem 0 0; margin-left: 0.5rem; border: 1px solid #94a3b8; border-bottom: none; }
+        .nav-nzqa:hover { background-color: #94a3b8; color: #0f172a; }
+        .nav-nzqa.active { background-color: #475569; color: white; border-color: #475569; }
+
+        /* Sub Navigation */
+        .sub-btn { padding: 0.5rem 1.25rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 700; border: 1px solid #cbd5e1; color: #475569; background: white; transition: all 0.2s ease; cursor: pointer; white-space: nowrap; }
+        .sub-btn:hover { background: #f1f5f9; }
+        .sub-btn.active { background: var(--geo-primary); color: white; border-color: var(--geo-primary); box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+
+        /* Locked State Logic */
+        body.locked-mode .nav-btn:not(#nav-aim) { opacity: 0.5; pointer-events: none; filter: grayscale(100%); }
+        body.locked-mode .content-requires-lock { display: none !important; }
+        body:not(.locked-mode) .requires-lock-warning { display: none !important; }
+
+        /* Inputs & Buttons */
+        .draft-box { width: 100%; padding: 1.25rem; border-radius: 0.75rem; border: 2px solid #cbd5e1; font-size: 0.95rem; min-height: 250px; outline: none; transition: all 0.2s ease; resize: vertical; line-height: 1.6; background-color: #ffffff; color: #334155; }
+        .draft-box:focus { border-color: var(--geo-primary); box-shadow: 0 0 0 4px var(--geo-light); }
+        .btn-copy { background: white; border: 1px solid #cbd5e1; color: #475569; padding: 0.35rem 0.85rem; border-radius: 0.5rem; font-weight: 700; font-size: 0.75rem; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.35rem; }
+        .btn-copy:hover { background: #f8fafc; color: var(--geo-primary); border-color: var(--geo-primary); }
+
+        /* Exemplars */
+        .exemplar-box { border-left: 4px solid var(--geo-primary); background-color: white; border: 1px solid #e2e8f0; padding: 1.5rem; border-radius: 0 0.5rem 0.5rem 0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); height: 100%; }
+
+        /* Modals */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; padding: 1rem; }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .modal-content { background: white; border-radius: 1rem; max-width: 600px; width: 100%; transform: scale(0.95); transition: transform 0.3s ease; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+        .modal-overlay.show .modal-content { transform: scale(1); }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+        /* Dynamic Rich Tooltips */
+        .concept-hover { position: relative; border-bottom: 2px dotted var(--geo-primary); cursor: help; font-weight: bold; color: var(--geo-dark); display: block; padding: 0.5rem 0.75rem; border-radius: 0.5rem; background: #f8fafc; border: 1px solid #e2e8f0; transition: all 0.2s ease; }
+        .concept-hover:hover { background: var(--geo-light); }
+        
+        /* Mobile Default: Pop Down */
+        .concept-tooltip { position: absolute; top: 125%; left: 50%; transform: translateX(-50%); width: 280px; background: #0f172a; color: white; padding: 1.25rem; border-radius: 0.75rem; font-size: 0.8rem; font-weight: normal; line-height: 1.6; opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 99999; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4); pointer-events: none; text-align: left; }
+        .concept-tooltip::after { content: ''; position: absolute; bottom: 100%; left: 50%; margin-left: -6px; border-width: 6px; border-style: solid; border-color: transparent transparent #0f172a transparent; }
+        
+        /* Desktop: Pop to the left to prevent screen overflow on the right side */
+        @media (min-width: 1024px) {
+            .concept-tooltip { top: 50%; left: auto; right: 105%; transform: translateY(-50%); width: 360px; }
+            .concept-tooltip::after { top: 50%; bottom: auto; left: 100%; margin-top: -6px; margin-left: 0; border-color: transparent transparent transparent #0f172a; }
+        }
+
+        .concept-hover:hover .concept-tooltip { opacity: 1; visibility: visible; }
+        
+        .tooltip-title { color: var(--geo-gold); font-weight: 800; text-transform: uppercase; margin-bottom: 0.25rem; display: block; letter-spacing: 0.05em; font-size: 0.9rem; }
+        .tooltip-usage { color: #94a3b8; font-size: 0.75rem; display: block; margin-bottom: 0.5rem; line-height: 1.4; border-bottom: 1px dashed #334155; padding-bottom: 0.5rem; }
+        .tooltip-sentence { font-style: italic; color: #cbd5e1; display: block; background: #1e293b; padding: 0.5rem; border-radius: 0.25rem; margin-top: 0.25rem; }
+
+        .chart-container { position: relative; width: 100%; height: 280px; margin: 0 auto; }
+        .excellence-badge { background-color: #f59e0b; color: white; font-weight: 800; padding: 0.125rem 0.35rem; border-radius: 0.25rem; }
+        .map-canvas-container { background: #f1f5f9; border: 1px dashed #cbd5e1; border-radius: 0.5rem; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; }
+
+        /* Floating Mentor Chat - Max Z-Index */
+        .chat-widget { position: fixed; bottom: 24px; right: 24px; z-index: 99999; display: flex; flex-direction: column; align-items: flex-end; }
+        .chat-panel { width: 360px; height: 420px; max-height: calc(100vh - 100px); background: white; border-radius: 1rem; box-shadow: 0 15px 35px -5px rgba(0,0,0,0.3); display: flex; flex-direction: column; overflow: hidden; margin-bottom: 16px; transform-origin: bottom right; transform: scale(0); opacity: 0; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid #e2e8f0; pointer-events: none; }
+        .chat-panel.show { transform: scale(1); opacity: 1; pointer-events: auto; }
+        .chat-fab { width: 64px; height: 64px; border-radius: 50%; background: var(--geo-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.4); cursor: pointer; transition: transform 0.2s ease, background 0.3s ease; border: 2px solid white; }
+        .chat-fab:hover { transform: scale(1.05); }
+        .chat-fab.open { background: #ef4444; transform: rotate(90deg) scale(0.9); }
+        
+        .chat-messages { flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; background: #f8fafc; }
+        .chat-input-area { display: flex; gap: 0.5rem; border-top: 1px solid #e2e8f0; background: white; }
+        .chat-input { flex: 1; border: 1px solid #cbd5e1; border-radius: 0.5rem; padding: 0.5rem; font-size: 0.875rem; outline: none; }
+        .chat-input:focus { border-color: var(--geo-primary); }
+        .mentor-send { background: var(--geo-primary); color: white; border-radius: 0.5rem; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: bold; }
+
+        .msg-mentor { background: var(--geo-dark); color: white; padding: 0.75rem 1rem; border-radius: 1rem 1rem 1rem 0; align-self: flex-start; max-width: 85%; font-size: 0.9rem; line-height: 1.5; }
+        .msg-user { background: var(--geo-light); color: var(--geo-dark); padding: 0.75rem 1rem; border-radius: 1rem 1rem 0 1rem; align-self: flex-end; max-width: 85%; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--geo-border); line-height: 1.5; }
+        
+        .pop-alert { animation: slide-down 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slide-down { 0% { opacity: 0; transform: translateY(-10px); } 100% { opacity: 1; transform: translateY(0); } }
+
+        /* Toast Alert Box */
+        .toast-box { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: #1e293b; color: white; padding: 1rem 1.5rem; border-radius: 0.75rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); font-size: 0.875rem; font-weight: 600; display: flex; align-items: center; gap: 10px; transform: translateX(120%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: auto; }
+        .toast.show { transform: translateX(0); }
+        .toast-error { border-left: 5px solid #ef4444; }
+        .toast-success { border-left: 5px solid #10b981; }
+        .toast-info { border-left: 5px solid #3b82f6; }
+    </style>
+</head>
+<body data-level="3" class="locked-mode pb-10">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-box"></div>
+
+    <div class="max-w-7xl mx-auto px-4 md:px-8 mt-6">
+        
+        <!-- HEADER -->
+        <header class="rounded-2xl p-8 md:p-10 text-white mb-6 shadow-xl relative overflow-hidden" style="background: var(--geo-gradient);">
+            <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div class="flex items-center gap-5">
+                    <div class="text-5xl md:text-6xl animate-pulse">🌍</div>
+                    <div>
+                        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-2">GeoResearch Hub</h1>
+                        <h2 class="text-xl md:text-2xl font-normal text-[var(--geo-gold)]" id="header-subtitle">Conduct Geographic Research (3.5)</h2>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col items-end gap-3 w-full md:w-auto">
+                    <div class="bg-black/20 p-1.5 rounded-lg flex items-center gap-1 shadow-inner border border-white/10 shrink-0 z-20">
+                        <button onclick="setLevel(2)" id="btn-lvl-2" class="px-5 py-2.5 rounded-md font-bold text-sm text-white/70 hover:text-white transition-all">Level 2 (2.5)</button>
+                        <button onclick="setLevel(3)" id="btn-lvl-3" class="px-5 py-2.5 rounded-md font-bold text-sm bg-white theme-text shadow-md transition-all">Level 3 (3.5)</button>
+                    </div>
+                    <button onclick="exportDrafts()" class="text-sm bg-white/10 hover:bg-white/20 border border-white/30 px-5 py-2.5 rounded-md transition font-bold flex items-center gap-2 shadow-sm w-full md:w-auto justify-center">
+                        📥 Export All Drafts
+                    </button>
+                </div>
+            </div>
+            <div class="absolute right-[-2%] top-[-20%] text-[18rem] opacity-5 pointer-events-none transform rotate-12 select-none">🧭</div>
+        </header>
+
+        <!-- MAIN NAVIGATION -->
+        <nav class="sticky top-0 z-40 bg-[var(--geo-accent)]/95 backdrop-blur-md flex items-center justify-start lg:justify-center border-b-2 border-slate-300 mb-8 gap-1 overflow-x-auto pt-4 px-2 custom-scrollbar rounded-t-xl" id="main-nav">
+            <button class="nav-btn active" id="nav-aim" onclick="switchView('aim')">1. Aim</button>
+            <button class="nav-btn" id="nav-plan" onclick="switchView('plan')">2. Plan</button>
+            <button class="nav-btn" id="nav-data" onclick="switchView('data')">3. Data</button>
+            <button class="nav-btn" id="nav-presentation" onclick="switchView('presentation')">4. Presentation</button>
+            <button class="nav-btn" id="nav-analysis" onclick="switchView('analysis')">5. Analysis <span class="excellence-badge text-xs px-1 py-0.5 rounded-sm">E</span></button>
+            <button class="nav-btn" id="nav-conclusion" onclick="switchView('conclusion')">6. Conclusion</button>
+            <button class="nav-btn" id="nav-evaluation" onclick="switchView('evaluation')">7. Evaluation <span class="excellence-badge text-xs px-1 py-0.5 rounded-sm">E</span></button>
+            <button class="nav-btn" id="nav-final" onclick="switchView('final')">8. Final</button>
+            <button class="nav-btn nav-nzqa" id="nav-nzqa" onclick="switchView('nzqa')">9. NZQA</button>
+        </nav>
+
+        <main class="min-h-[60vh]">
+            
+            <!-- ================= VIEW 1: AIM ================= -->
+            <div id="view-aim" class="view-section space-y-8 animate-in fade-in duration-500">
+                <div class="text-center max-w-3xl mx-auto mb-8">
+                    <h2 class="text-3xl font-black text-slate-900 mb-4">Establishing Your Research Aim</h2>
+                    <p class="text-lg text-slate-600">Geographic research requires an investigative process related to a particular area. Your aim MUST have a <strong>spatial component</strong>.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="glass-card p-6 md:p-8 border-t-4 theme-border-t shadow-md" id="aim-input-container">
+                            <label class="text-base font-bold text-slate-800 uppercase tracking-widest block mb-4">Draft Your Research Aim:</label>
+                            <div class="flex flex-col gap-4">
+                                <input type="text" id="draft-topic" placeholder="e.g. To analyse the spatial distribution of..." class="w-full p-4 rounded-xl border-2 border-slate-300 font-medium outline-none focus:border-[var(--geo-primary)] text-lg shadow-inner bg-slate-50 transition-colors">
+                                <button onclick="checkAim()" class="theme-bg hover:opacity-90 px-8 py-5 rounded-xl font-bold transition shadow-md text-lg flex justify-center items-center gap-3">
+                                    <span>Check Aim & Lock In Workflow</span> <span class="text-2xl">💡</span>
+                                </button>
+                            </div>
+                            <div class="mt-6 pt-6 border-t border-slate-200">
+                                <span class="text-sm font-bold text-slate-500 uppercase block mb-3">Topic Ideas (Click to populate and test):</span>
+                                <div class="flex gap-2 flex-wrap">
+                                    <button onclick="populateAim('To analyse the spatial variation of commuting transport patterns and traffic congestion perceptions between inner-city and suburban zones')" class="text-xs bg-slate-100 hover:bg-slate-200 border border-slate-300 px-3 py-2 rounded-lg font-bold text-slate-700 transition">Transport Patterns</button>
+                                    <button onclick="populateAim('To investigate the spatial distribution of housing affordability and its impact on community well-being across different census meshblocks')" class="text-xs bg-slate-100 hover:bg-slate-200 border border-slate-300 px-3 py-2 rounded-lg font-bold text-slate-700 transition">Housing Affordability</button>
+                                    <button onclick="populateAim('To analyse spatial variations in community hazard perception and tsunami preparedness between coastal and inland residential zones')" class="text-xs bg-slate-100 hover:bg-slate-200 border border-slate-300 px-3 py-2 rounded-lg font-bold text-slate-700 transition">Hazard Perception</button>
+                                    <button onclick="populateAim('To investigate spatial differences in pedestrian activity and retail usage along a pedestrianised main street versus a traditional vehicle access street')" class="text-xs bg-slate-100 hover:bg-slate-200 border border-slate-300 px-3 py-2 rounded-lg font-bold text-slate-700 transition">Pedestrianised Streets</button>
+                                    <button onclick="populateAim('To examine how sustainable community initiatives vary spatially across differing socio-economic council wards')" class="text-xs bg-slate-100 hover:bg-slate-200 border border-slate-300 px-3 py-2 rounded-lg font-bold text-slate-700 transition">Sustainable Communities</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LOCKED DISPLAY -->
+                        <div id="locked-aim-display" class="hidden bg-[#f0fdf4] p-8 rounded-xl border-2 border-[#bbf7d0] shadow-sm relative overflow-hidden">
+                            <div class="flex justify-between items-start z-10 relative">
+                                <div class="w-full">
+                                    <h3 class="text-sm font-bold text-[#166534] uppercase tracking-widest mb-3 flex items-center gap-2"><span>📌</span> Locked Research Aim</h3>
+                                    <p class="text-xl font-bold text-[#14532d] bg-white p-4 rounded-lg border border-[#bbf7d0] shadow-sm" id="locked-topic-text">[Your Topic Here]</p>
+                                </div>
+                            </div>
+                            <div class="mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center z-10 relative border-t border-[#bbf7d0] pt-5 gap-4">
+                                <span class="text-sm font-bold text-[#15803d] bg-[#dcfce7] px-4 py-2 rounded-lg shadow-sm">🔓 All workbook tabs are now fully unlocked.</span>
+                                <button onclick="unlockTopic()" class="text-sm font-bold text-[#15803d] bg-white border border-[#bbf7d0] px-5 py-2 rounded-lg shadow-sm hover:bg-[#dcfce7] transition">Edit Topic</button>
+                            </div>
+                            <div class="absolute right-[-2%] bottom-[-15%] text-[12rem] opacity-10 select-none pointer-events-none">✅</div>
+                        </div>
+
+                        <div class="glass-card p-6 md:p-8">
+                            <h3 class="text-xl font-bold text-slate-900 mb-5">Excellence Aim Checklist</h3>
+                            <ul class="space-y-4 text-base text-slate-700">
+                                <li class="flex items-start gap-4">
+                                    <span class="text-green-500 text-2xl leading-none">☑️</span>
+                                    <div><strong class="block text-slate-900 mb-1">Spatial Component</strong> Does it explore spatial variations, distribution grids, profiles, patterns, or direct environmental constraints?</div>
+                                </li>
+                                <li class="flex items-start gap-4">
+                                    <span class="text-green-500 text-2xl leading-none">☑️</span>
+                                    <div><strong class="block text-slate-900 mb-1">Primary Data Viability</strong> Can this structural data be verified directly by you through field measurements, tally frameworks, or local surveys?</div>
+                                </li>
+                                <li class="flex items-start gap-4 l3-only">
+                                    <span class="text-blue-500 text-2xl leading-none">☑️</span>
+                                    <div><strong class="block text-slate-900 mb-1">Consultation Element (Level 3 Only)</strong> Has this inquiry framework been cross-referenced with school planning bounds and localised field accessibility parameters?</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-1 space-y-6">
+                        <div class="exemplar-box bg-slate-50 border-slate-200">
+                            <div class="flex justify-between items-center mb-5 border-b border-slate-200 pb-3">
+                                <h4 class="font-bold theme-text text-sm uppercase tracking-widest">Exemplar Frameworks</h4>
+                            </div>
+                            <div id="aim-exemplars" class="space-y-6 text-sm text-slate-700 leading-relaxed">
+                                <div>
+                                    <strong class="block text-green-700 mb-1 text-base">✅ Strong (Perception Process):</strong>
+                                    "To analyse spatial variations in community hazard perception and tsunami preparedness between coastal and inland residential zones."
+                                </div>
+                                <hr class="border-slate-200">
+                                <div>
+                                    <strong class="block text-green-700 mb-1 text-base">✅ Strong (Urban Interaction):</strong>
+                                    "To investigate the spatial distribution of housing affordability and its impact on community well-being across different census meshblocks."
+                                </div>
+                                <hr class="border-slate-200">
+                                <div class="border-l-4 border-red-400 pl-4 py-3 bg-red-50 rounded-r-lg">
+                                    <strong class="block text-red-800 mb-1 text-base">❌ Weak (Unacceptable Research Axis):</strong>
+                                    <span class="text-slate-800 font-medium">"To find out if local people like the new community centre."</span><br>
+                                    <span class="text-xs text-red-600 mt-2 block font-bold uppercase tracking-wider">(Pure opinion survey; has zero spatial metrics or mapping capabilities)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW 2: PLAN ================= -->
+            <div id="view-plan" class="view-section hidden space-y-8 animate-in fade-in duration-500">
+                <div class="text-center max-w-3xl mx-auto mb-8">
+                    <h2 class="text-3xl font-black text-slate-900 mb-4">Planning the Methodology</h2>
+                    <p class="text-lg text-slate-600">A sound methodology details your research context so precisely that another researcher could duplicate your workflow exactly.</p>
+                </div>
+
+                <div class="requires-lock-warning bg-amber-50 border border-amber-200 p-10 rounded-2xl text-center shadow-sm max-w-2xl mx-auto">
+                    <span class="text-6xl mb-4 block">🔒</span>
+                    <h3 class="font-bold text-amber-900 text-2xl mb-2">Topic Not Locked</h3>
+                    <p class="text-amber-800 text-base">Please navigate back to the <strong>Aim</strong> tab and establish a valid layout to unlock tailored planning advice tools.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-8 content-requires-lock">
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-xl shadow-sm">
+                            <h4 class="font-bold text-blue-900 text-sm uppercase tracking-widest mb-3 flex items-center gap-2"><span>💡</span> Dynamic Topic Strategy</h4>
+                            <ul id="dyn-advice-plan" class="text-sm text-blue-900 font-medium leading-relaxed space-y-2 list-disc list-inside bg-white/50 p-4 rounded shadow-inner">
+                                <li>Loading contextual advice based on your aim...</li>
+                            </ul>
+                        </div>
+
+                        <div class="glass-card theme-border-t">
+                            <h3 class="text-xl font-bold text-slate-900 mb-5">Methodology Design Requirements</h3>
+                            <div class="grid sm:grid-cols-2 gap-5 text-base">
+                                <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 shadow-sm">
+                                    <h4 class="font-bold text-slate-900 mb-2">🗺️ Geographic Coordinate Bounds</h4>
+                                    <p class="text-sm text-slate-700">Isolate study nodes (e.g., specific suburban zones, transit hubs, structured intercept zones).</p>
+                                </div>
+                                <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 shadow-sm">
+                                    <h4 class="font-bold text-slate-900 mb-2">⏱️ Temporal Sampling Regularity</h4>
+                                    <p class="text-sm text-slate-700">Define precise dates and times (e.g., "10:00 AM off-peak vs 4:30 PM peak-flow intervals").</p>
+                                </div>
+                                <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 shadow-sm">
+                                    <h4 class="font-bold text-slate-900 mb-2">🔢 Quantitative Array Sizes</h4>
+                                    <p class="text-sm text-slate-700">Establish thresholds for data reliability (e.g., minimum 40 completed surveys per demographic zone).</p>
+                                </div>
+                                <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 shadow-sm">
+                                    <h4 class="font-bold text-slate-900 mb-2">🛠️ Survey & Data Apparatus</h4>
+                                    <p class="text-sm text-slate-700">Itemize tracking tools (e.g., digital Likert-scale forms on tablets, printed bilingual questionnaires).</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card bg-slate-50">
+                            <div class="flex justify-between items-center mb-4">
+                                <label class="text-base font-bold text-slate-800 uppercase tracking-widest">Draft Your Methodology:</label>
+                                <button onclick="copyText('draft-plan', this)" class="btn-copy">📋 Copy</button>
+                            </div>
+                            
+                            <!-- Enhanced Instructional Text -->
+                            <div class="bg-white border border-slate-200 p-4 rounded-lg mb-4 text-sm text-slate-600 leading-relaxed">
+                                <strong>How to write this section:</strong> Break your method down logically. <br>
+                                1. Start by naming the <strong>exact locations/dates/times</strong>. <br>
+                                2. List the <strong>specific tools/surveys</strong> you used.<br>
+                                3. Write a step-by-step procedure detailing exactly <strong>who</strong> did <strong>what</strong>, <strong>how many times</strong> you did it, and how you ensured accuracy (e.g. "Student A conducted surveys using systematic sampling (every 5th person) until a quota of n=30 was reached at Node 1").
+                            </div>
+                            
+                            <textarea id="draft-plan" class="draft-box" placeholder="Describe your methodology here based on the instructions above..."></textarea>
+                            
+                            <button onclick="requestFeedback('plan')" class="mt-5 theme-bg px-6 py-4 rounded-xl font-bold text-lg w-full transition flex justify-center items-center gap-3 shadow-md hover:shadow-lg hover:-translate-y-0.5">
+                                Send Plan to Geo Mentor ✨
+                            </button>
+                            <div id="fb-alert-plan" class="hidden mt-5 p-5 rounded-xl text-base border font-medium pop-alert"></div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-1 space-y-6">
+                        <div class="exemplar-box bg-white border-slate-200 shadow-sm">
+                            <div class="flex flex-col gap-3 mb-5 border-b border-slate-200 pb-4">
+                                <div class="flex justify-between items-center">
+                                    <h4 class="font-bold theme-text text-sm uppercase tracking-widest font-sans">Method Exemplars</h4>
+                                </div>
+                                <select id="ex-plan-select" onchange="changeExemplar('plan')" class="text-sm border border-slate-300 rounded-lg p-2.5 outline-none font-bold text-slate-700 bg-slate-50 cursor-pointer w-full shadow-sm">
+                                    <option value="hazard">Hazard Perception Strategy</option>
+                                    <option value="transport">Transport Patterns Strategy</option>
+                                    <option value="housing">Housing Affordability Strategy</option>
+                                </select>
+                            </div>
+                            <p id="ex-plan-text" class="text-sm text-slate-700 bg-slate-50/50 p-4 rounded border border-slate-200 italic leading-relaxed text-left"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW 3: DATA COLLECTION ================= -->
+            <div id="view-data" class="view-section hidden space-y-8 animate-in fade-in duration-500">
+                <div class="text-center max-w-3xl mx-auto mb-8">
+                    <h2 class="text-3xl font-black text-slate-900 mb-4">Fieldwork Data Structuring</h2>
+                    <p class="text-lg text-slate-600">Excellence workflows require structured, balanced recording mechanisms utilising multiple primary data collection methods.</p>
+                </div>
+
+                <div class="requires-lock-warning bg-amber-50 border border-amber-200 p-10 rounded-2xl text-center shadow-sm max-w-2xl mx-auto">
+                    <span class="text-6xl mb-4 block">🔒</span>
+                    <h3 class="font-bold text-amber-900 text-2xl mb-2">Topic Not Locked</h3>
+                    <p class="text-amber-800 text-base">Please lock in your initial research inquiry parameters to access raw matrix tools.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-8 content-requires-lock">
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-xl shadow-sm">
+                            <h4 class="font-bold text-blue-900 text-sm uppercase tracking-widest mb-3 flex items-center gap-2"><span>💡</span> Dynamic Topic Strategy</h4>
+                            <ul id="dyn-advice-data" class="text-sm text-blue-900 font-medium leading-relaxed space-y-2 list-disc list-inside bg-white/50 p-4 rounded shadow-inner">
+                                <li>Loading contextual advice based on your aim...</li>
+                            </ul>
+                        </div>
+
+                        <!-- Data Sub-Nav (Expanded to 4 Sections) -->
+                        <div class="flex flex-wrap gap-2 bg-white p-2 rounded-xl border w-full">
+                            <button class="sub-btn sub-btn-data active flex-1" id="sub-btn-data-human" onclick="switchSubTab('data', 'human')">🗣️ Human/Social</button>
+                            <button class="sub-btn sub-btn-data flex-1" id="sub-btn-data-obs" onclick="switchSubTab('data', 'obs')">👁️ Visual/Obs</button>
+                            <button class="sub-btn sub-btn-data flex-1" id="sub-btn-data-phys" onclick="switchSubTab('data', 'phys')">📏 Physical/Sci</button>
+                            <button class="sub-btn sub-btn-data flex-1" id="sub-btn-data-sec" onclick="switchSubTab('data', 'sec')">📚 Secondary</button>
+                        </div>
+
+                        <!-- Human/Social Tab -->
+                        <div id="sub-data-human" class="sub-content-data glass-card">
+                            <h3 class="text-xl font-bold mb-4">Interviews & Surveys</h3>
+                            <div class="grid sm:grid-cols-2 gap-6">
+                                <div class="text-sm text-slate-600 space-y-3">
+                                    <p><strong>Excellence Strategy:</strong> Convert environmental or hazard perceptions into structured <strong>Likert Scales (1-5)</strong> for easy mathematical graphing.</p>
+                                    <p class="border-l-2 border-slate-300 pl-3 italic">Crucial Spatial Anchor: Always ask "Identify your primary cross-street or residential zone." Without this, survey data cannot be mapped.</p>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-inner">
+                                    <span class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Scale Survey Mockup</span>
+                                    <div class="bg-white p-4 rounded border text-xs space-y-2">
+                                        <p class="font-bold text-slate-800">Q: Rate your personal level of tsunami hazard preparedness:</p>
+                                        <div class="flex justify-between font-mono text-[10px] text-slate-500 pt-2">
+                                            <span class="flex flex-col items-center"><input type="radio" name="mk1"> 1 (Unprepared)</span>
+                                            <span class="flex flex-col items-center"><input type="radio" name="mk1" checked> 3 (Neutral)</span>
+                                            <span class="flex flex-col items-center"><input type="radio" name="mk1"> 5 (Highly Prepared)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Observation Tab -->
+                        <div id="sub-data-obs" class="sub-content-data hidden glass-card">
+                            <h3 class="text-xl font-bold mb-4">Direct Observation & Visuals</h3>
+                            <div class="grid sm:grid-cols-2 gap-6">
+                                <div class="text-sm text-slate-600 space-y-3">
+                                    <p><strong>Physical Counts & Tally Sheets:</strong> Run tally structures synchronously at different nodes to ensure temporal equivalence.</p>
+                                    <p><strong>Photos & Field Sketches:</strong> Essential primary visual data. Sketches filter out background noise, focusing solely on the geographic feature you are studying.</p>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-inner overflow-x-auto">
+                                    <span class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Synchronised Tally Matrix</span>
+                                    <table class="w-full text-left font-mono text-xs border bg-white rounded">
+                                        <tr class="bg-slate-100 border-b"><th class="p-1.5">Station</th><th class="p-1.5">Window</th><th class="p-1.5">Raw Log</th></tr>
+                                        <tr class="border-b"><td class="p-1.5 font-bold">Node A</td><td class="p-1.5 text-slate-500">0830</td><td class="p-1.5 text-blue-600 font-bold tracking-widest">卌 卌 卌 ||</td></tr>
+                                        <tr><td class="p-1.5 font-bold">Node B</td><td class="p-1.5 text-slate-500">0830</td><td class="p-1.5 text-blue-600 font-bold tracking-widest">卌 ||||</td></tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Physical Tab -->
+                        <div id="sub-data-phys" class="sub-content-data hidden glass-card">
+                            <h3 class="text-xl font-bold mb-4">Physical Measurements & Sampling</h3>
+                            <div class="p-6 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-xl space-y-4">
+                                <p class="text-sm text-slate-600 leading-relaxed">When measuring physical geographical landscapes (channel areas, dunes, wind speeds) or infrastructural distances, always track raw spatial metrics across <strong>multiple separate trials</strong> per node to average out anomalies and establish sampling reliability.</p>
+                                <div class="flex gap-4 text-slate-500 font-mono font-bold text-xs justify-center pt-2 flex-wrap">
+                                    <span class="bg-white p-2 border rounded shadow-sm">Clinometer ±0.5°</span>
+                                    <span class="bg-white p-2 border rounded shadow-sm">Flow Probe (m/s)</span>
+                                    <span class="bg-white p-2 border rounded shadow-sm">Callipers (mm)</span>
+                                    <span class="bg-white p-2 border rounded shadow-sm">Quadrat Sampling</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Secondary Tab -->
+                        <div id="sub-data-sec" class="sub-content-data hidden glass-card">
+                            <h3 class="text-xl font-bold mb-4">Secondary Data Integrations</h3>
+                            <div class="p-6 bg-slate-50 border border-slate-200 rounded-xl space-y-4">
+                                <p class="text-sm text-slate-600 leading-relaxed">Excellence research often cross-references primary fieldwork against established secondary datasets to prove larger temporal or regional patterns.</p>
+                                <ul class="text-sm text-slate-700 list-disc list-inside space-y-2">
+                                    <li><strong>Census Data:</strong> Compare your survey demographics against official local deprivation indices or population density meshblocks.</li>
+                                    <li><strong>Historical Maps & GIS:</strong> Use old topographic or aerial maps to prove how much an area has urbanised or eroded since 1990.</li>
+                                    <li><strong>Council Reports/Data:</strong> Pull official council transport logs or hazard zone declarations to validate your primary findings.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-1 space-y-6">
+                        <div class="glass-card border-t-4 border-slate-800 bg-white shadow-md">
+                            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2"><span class="text-2xl">📱</span> Digital GIS Tool Integrations</h3>
+                            <div class="text-xs text-slate-600 space-y-4 leading-relaxed">
+                                <div class="p-3 bg-slate-50 rounded border">
+                                    <strong class="text-slate-800 block mb-1">ArcGIS Survey123 Layouts</strong>
+                                    Enables geo-tagged input matrices. Every response automatically pins precise lat/long coordinates onto an interactive structural basemap.
+                                </div>
+                                <div class="p-3 bg-slate-50 rounded border">
+                                    <strong class="text-slate-800 block mb-1">ArcGIS Field Maps Tracking</strong>
+                                    Allows real-time polygon mapping of physical environment anomalies (e.g., dune blowouts, infrastructure deterioration zones).
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW 4: PRESENTATION ================= -->
+            <div id="view-presentation" class="view-section hidden space-y-8 animate-in fade-in duration-500">
+                <div class="text-center max-w-3xl mx-auto mb-6">
+                    <h2 class="text-3xl font-black text-slate-900 mb-2">Data Processing & Cartography</h2>
+                    <p class="text-base text-slate-600">Excellence profiles require selecting visualisation styles that match your geographic datasets.</p>
+                    
+                    <!-- Added Horizontal Tutorials Bar -->
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 max-w-2xl mx-auto mt-6">
+                        <a href="https://www.youtube.com/playlist?list=PLnHGWErd6BE6vEFQYjzRAlpxuEVwuroFD" target="_blank" class="flex-1 flex items-center justify-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-900 p-3 rounded-lg border border-indigo-200 shadow-sm transition-colors font-bold text-sm">
+                            🗺️ How to use GIS ↗
+                        </a>
+                        <a href="https://www.youtube.com/watch?v=POAlkUWhRog" target="_blank" class="flex-1 flex items-center justify-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-900 p-3 rounded-lg border border-indigo-200 shadow-sm transition-colors font-bold text-sm">
+                            📊 Graphs in Google Sheets ↗
+                        </a>
+                    </div>
+                </div>
+
+                <div class="requires-lock-warning text-center py-20 bg-amber-50 rounded-2xl border border-amber-200 max-w-xl mx-auto shadow-sm">
+                    <span class="text-5xl block mb-4">🔒</span>
+                    <p class="font-bold text-amber-900">Lock your research aim first to generate interactive chart modules.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-8 content-requires-lock">
+                    <div class="lg:col-span-2 space-y-6">
+                        
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-xl shadow-sm">
+                            <h4 class="font-bold text-blue-900 text-sm uppercase tracking-widest mb-3 flex items-center gap-2"><span>💡</span> Dynamic Topic Strategy</h4>
+                            <ul id="dyn-advice-pres" class="text-sm text-blue-900 font-medium leading-relaxed space-y-2 list-disc list-inside bg-white/50 p-4 rounded shadow-inner">
+                                <li>Loading contextual advice based on your aim...</li>
+                            </ul>
+                        </div>
+
+                        <div class="flex gap-2 bg-white p-2 rounded-xl border w-full overflow-x-auto">
+                            <button class="sub-btn sub-btn-pres active flex-1 font-bold" id="sub-btn-pres-graphs" onclick="switchSubTab('pres', 'graphs')">📊 Graphs & Tables</button>
+                            <button class="sub-btn sub-btn-pres flex-1 font-bold" id="sub-btn-pres-maps" onclick="switchSubTab('pres', 'maps')">🗺️ Maps & GIS</button>
+                            <button class="sub-btn sub-btn-pres flex-1 font-bold" id="sub-btn-pres-visuals" onclick="switchSubTab('pres', 'visuals')">📸 Visuals & Diagrams</button>
+                        </div>
+
+                        <!-- Expanded Graphs Sandbox -->
+                        <div id="sub-pres-graphs" class="sub-content-pres space-y-4">
+                            <div class="glass-card theme-border-t">
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-5 border-b pb-4">
+                                    <div>
+                                        <h3 class="text-lg font-bold">Data Rendering Engine</h3>
+                                        <p class="text-xs text-slate-500 mt-1">Dynamically process and preview different structural graphic designs.</p>
+                                    </div>
+                                    <select id="graph-type-select" onchange="renderSpecificChart()" class="text-sm border-2 border-slate-300 rounded-lg p-2.5 font-bold focus:border-[var(--geo-primary)] outline-none bg-slate-50 cursor-pointer">
+                                        <option value="bar">Bar Graph</option>
+                                        <option value="line">Line Graph</option>
+                                        <option value="pie">Pie Graph</option>
+                                        <option value="stacked">Percentage Bar Graph (100%)</option>
+                                        <option value="scatter">Scatter Plot</option>
+                                        <option value="table">Data Tables</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="bg-white p-4 border rounded shadow-inner relative" id="presentation-canvas-wrapper">
+                                    <div class="chart-container">
+                                        <canvas id="presentationChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white p-4 border rounded shadow-inner hidden overflow-x-auto" id="presentation-table-wrapper">
+                                    <h4 class="font-bold text-center mb-4 text-sm text-slate-800">Processed Data: Average Perception vs Actual Distance</h4>
+                                    <table class="w-full text-left font-sans text-sm border-collapse">
+                                        <thead>
+                                            <tr>
+                                                <th class="bg-slate-200 p-3 border-b-2 border-slate-300 font-bold">Survey Zone</th>
+                                                <th class="bg-slate-200 p-3 border-b-2 border-slate-300 font-bold">Mean Preparedness Score (1-5)</th>
+                                                <th class="bg-slate-200 p-3 border-b-2 border-slate-300 font-bold">Distance from Coast (km)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="border-b hover:bg-slate-50"><td class="p-3 font-semibold">Zone 1 (Coastal)</td><td class="p-3">4.2</td><td class="p-3">0.5</td></tr>
+                                            <tr class="border-b hover:bg-slate-50"><td class="p-3 font-semibold">Zone 2</td><td class="p-3">3.8</td><td class="p-3">2.0</td></tr>
+                                            <tr class="border-b hover:bg-slate-50"><td class="p-3 font-semibold">Zone 3 (Inland)</td><td class="p-3">2.1</td><td class="p-3">5.5</td></tr>
+                                            <tr class="border-b hover:bg-slate-50"><td class="p-3 font-semibold">Zone 4 (Periphery)</td><td class="p-3">1.5</td><td class="p-3">8.0</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Educational Description Box -->
+                                <div class="mt-6 bg-slate-900 text-white p-5 rounded-xl border border-slate-700 shadow-lg">
+                                    <h4 class="font-bold text-[var(--geo-gold)] uppercase tracking-wider text-xs mb-2 flex items-center gap-2">
+                                        <span>📝</span> Data Application Profile
+                                    </h4>
+                                    <p id="graph-educational-desc" class="text-sm leading-relaxed text-slate-300 font-medium">Loading details...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Expanded Maps Sandbox -->
+                        <div id="sub-pres-maps" class="sub-content-pres hidden space-y-4">
+                            <div class="glass-card theme-border-t">
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-5 border-b pb-4">
+                                    <div>
+                                        <h3 class="text-lg font-bold">Cartographic Mapping Tool</h3>
+                                        <p class="text-xs text-slate-500 mt-1">Review specialised mapping conventions required for Excellence.</p>
+                                    </div>
+                                    <select id="map-type-select" onchange="updateMapDisplay()" class="text-sm border-2 border-slate-300 rounded-lg p-2.5 font-bold focus:border-[var(--geo-primary)] outline-none bg-slate-50 cursor-pointer">
+                                        <option value="choropleth">Statistical Map (Choropleth)</option>
+                                        <option value="proportional">Proportional Symbols Map</option>
+                                        <option value="flow">Flow Line Map</option>
+                                        <option value="isoline">Isoline Map</option>
+                                        <option value="heat">GIS: Heat Map</option>
+                                        <option value="swipe">GIS: Swipe Map</option>
+                                        <option value="time_distance">Time/Distance Map</option>
+                                    </select>
+                                </div>
+
+                                <div class="map-canvas-container p-4 border rounded bg-slate-50">
+                                    <canvas id="geoCanvasMap" width="500" height="250" class="max-w-full h-auto bg-white border rounded shadow-sm"></canvas>
+                                </div>
+
+                                <!-- Educational Description Box -->
+                                <div class="mt-6 bg-slate-900 text-white p-5 rounded-xl border border-slate-700 shadow-lg">
+                                    <h4 class="font-bold text-teal-400 uppercase tracking-wider text-xs mb-2 flex items-center gap-2">
+                                        <span>🗺️</span> Spatial Mapping Application Profile
+                                    </h4>
+                                    <p id="map-educational-desc" class="text-sm leading-relaxed text-slate-300 font-medium">Loading details...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- New Visuals Sandbox -->
+                        <div id="sub-pres-visuals" class="sub-content-pres hidden space-y-4">
+                            <div class="glass-card theme-border-t">
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-5 border-b pb-4">
+                                    <div>
+                                        <h3 class="text-lg font-bold">Visual Evidence Tool</h3>
+                                        <p class="text-xs text-slate-500 mt-1">Review methods for integrating direct visual data.</p>
+                                    </div>
+                                    <select id="visual-type-select" onchange="updateVisualDisplay()" class="text-sm border-2 border-slate-300 rounded-lg p-2.5 font-bold focus:border-[var(--geo-primary)] outline-none bg-slate-50 cursor-pointer">
+                                        <option value="photo">Annotated Photos</option>
+                                        <option value="sketch">Field Sketches</option>
+                                        <option value="diagram">Diagrams</option>
+                                    </select>
+                                </div>
+
+                                <div class="p-4 border rounded bg-slate-50 flex items-center justify-center min-h-[250px]" id="visual-display-area">
+                                    <!-- Dynamic HTML Visuals injected here -->
+                                </div>
+
+                                <!-- Educational Description Box -->
+                                <div class="mt-6 bg-slate-900 text-white p-5 rounded-xl border border-slate-700 shadow-lg">
+                                    <h4 class="font-bold text-purple-400 uppercase tracking-wider text-xs mb-2 flex items-center gap-2">
+                                        <span>📸</span> Visual Application Profile
+                                    </h4>
+                                    <p id="visual-educational-desc" class="text-sm leading-relaxed text-slate-300 font-medium">Loading details...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="lg:col-span-1">
+                        <div class="sticky top-24 space-y-6">
+                            <div class="glass-card bg-amber-50 border-amber-200 shadow-sm">
+                                <h3 class="font-bold text-amber-900 text-sm uppercase tracking-widest mb-4">Cartographic Guidelines</h3>
+                                <p class="text-xs text-amber-800 leading-relaxed font-medium mb-4">Every map generated must contain these elements to meet spatial processing standards:</p>
+                                <div class="flex flex-col gap-2.5 text-xs font-bold text-slate-800">
+                                    <label class="flex items-center gap-3 bg-white p-2 border rounded shadow-sm"><input type="checkbox" checked disabled class="accent-amber-600"> Title</label>
+                                    <label class="flex items-center gap-3 bg-white p-2 border rounded shadow-sm"><input type="checkbox" checked disabled class="accent-amber-600"> Orientation (North Arrow)</label>
+                                    <label class="flex items-center gap-3 bg-white p-2 border rounded shadow-sm"><input type="checkbox" checked disabled class="accent-amber-600"> Scale</label>
+                                    <label class="flex items-center gap-3 bg-white p-2 border rounded shadow-sm"><input type="checkbox" checked disabled class="accent-amber-600"> Labelled Axis</label>
+                                    <label class="flex items-center gap-3 bg-amber-200 border-amber-400 p-2 border rounded shadow-sm text-amber-900"><input type="checkbox" checked disabled class="accent-amber-800"> KEY / LEGEND</label>
+                                    <label class="flex items-center gap-3 bg-white p-2 border rounded shadow-sm"><input type="checkbox" checked disabled class="accent-amber-600"> Frame</label>
+                                    <label class="flex items-center gap-3 bg-white p-2 border rounded shadow-sm"><input type="checkbox" checked disabled class="accent-amber-600"> Colour</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW 5: ANALYSIS ================= -->
+            <div id="view-analysis" class="view-section hidden space-y-8 animate-in fade-in duration-500">
+                <div class="text-center max-w-3xl mx-auto mb-8">
+                    <h2 class="text-3xl font-black text-slate-900 mb-4">
+                        <span class="l2-only">Explaining Findings</span>
+                        <span class="l3-only">Critical Spatial Analysis</span> 
+                        <span class="excellence-badge text-lg">E</span>
+                    </h2>
+                    <p class="text-lg text-slate-600">
+                        <span class="l2-only">Excellence Criteria: Fully explain the findings of your research by incorporating geographic concepts. You should relate your findings to the aims of the research and the relevant geographic concepts.</span>
+                        <span class="l3-only">Excellence Criteria: Critically examine structural spatial factors, account for <strong>anomalies/irregularities</strong>, and weave in geographic concepts.</span>
+                    </p>
+                </div>
+
+                <div class="requires-lock-warning bg-amber-50 border border-amber-200 p-10 rounded-2xl text-center shadow-sm max-w-2xl mx-auto">
+                    <span class="text-6xl mb-4 block">🔒</span>
+                    <h3 class="font-bold text-amber-900 text-2xl mb-2">Topic Not Locked</h3>
+                    <p class="text-amber-800 text-base">Please establish your core spatial aim parameters to populate the analysis helper utilities.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-8 content-requires-lock">
+                    <div class="lg:col-span-2 space-y-6">
+                        
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-xl shadow-sm">
+                            <h4 class="font-bold text-blue-900 text-sm uppercase tracking-widest mb-3 flex items-center gap-2"><span>💡</span> Dynamic Topic Strategy</h4>
+                            <ul id="dyn-advice-analysis" class="text-sm text-blue-900 font-medium leading-relaxed space-y-2 list-disc list-inside bg-white/50 p-4 rounded shadow-inner">
+                                <li>Loading contextual advice based on your aim...</li>
+                            </ul>
+                        </div>
+
+                        <div class="glass-card p-6 md:p-8 border-t-4 theme-border">
+                            <h3 class="text-xl font-bold text-slate-900 mb-5">The Excellence Analysis Architecture</h3>
+                            <div class="space-y-4 font-medium text-sm">
+                                <div class="flex gap-4 items-start bg-slate-50 p-3.5 border rounded-xl">
+                                    <div class="bg-slate-800 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold shrink-0 shadow-sm">1</div>
+                                    <div>
+                                        <h4 class="font-bold text-slate-800 uppercase tracking-wide text-xs mb-1">State General Spatial Trend</h4>
+                                        <p class="text-slate-600 text-xs">Is your distribution pattern clustered, linear, decentralised, peripheral, or characterised by a distance-decay effect?</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-4 items-start bg-blue-50 p-3.5 border border-blue-200 rounded-xl">
+                                    <div class="bg-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold shrink-0 shadow-sm">2</div>
+                                    <div>
+                                        <h4 class="font-bold text-blue-900 uppercase tracking-wide text-xs mb-1">Integrate Geographic Concepts</h4>
+                                        <p class="text-blue-800 text-xs">Connect findings to an active concept. Utilise the definition terms found in the concept engine.</p>
+                                    </div>
+                                </div>
+                                <div class="l3-only flex gap-4 items-start bg-amber-50 p-3.5 border border-amber-200 rounded-xl shadow-sm transform hover:scale-[1.01] transition">
+                                    <div class="bg-amber-500 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold shrink-0 shadow-sm">3</div>
+                                    <div>
+                                        <h4 class="font-bold text-amber-900 uppercase tracking-wide text-xs mb-1">Isolate Spatial Anomalies (Level 3 'E' Requirement)</h4>
+                                        <p class="text-amber-800 text-xs">Identify data points or mapping zones that completely break the overall trend. Pinpoint the local factors driving this variation.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-4 items-start bg-emerald-50 p-3.5 border border-emerald-200 rounded-xl">
+                                    <div class="bg-emerald-600 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold shrink-0 shadow-sm">4</div>
+                                    <div>
+                                        <h4 class="font-bold text-emerald-900 uppercase tracking-wide text-xs mb-1">Embed Hard Empirical Evidence</h4>
+                                        <p class="text-emerald-800 text-xs">Incorporate specific calculations, cross-sectional slope metrics, coordinates, or percentage variations directly into your analysis paragraph.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-4 items-start bg-indigo-50 p-3.5 border border-indigo-200 rounded-xl">
+                                    <div class="bg-indigo-600 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold shrink-0 shadow-sm">5</div>
+                                    <div>
+                                        <h4 class="font-bold text-indigo-900 uppercase tracking-wide text-xs mb-1">Explanation (The Why)</h4>
+                                        <p class="text-indigo-800 text-xs">Why do we get these exact results? Explain the underlying physical or cultural reasons causing this specific data distribution in this specific location.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card p-6 md:p-8 bg-slate-50">
+                            <div class="flex justify-between items-center mb-4">
+                                <label class="text-base font-bold text-slate-800 uppercase tracking-widest">Draft Your Critical Analysis Paragraph:</label>
+                                <button onclick="copyText('draft-analysis', this)" class="btn-copy">📋 Copy</button>
+                            </div>
+                            
+                            <!-- Detailed instructions above the draft box -->
+                            <div class="bg-white border border-slate-200 p-4 rounded-lg mb-4 text-sm text-slate-600 leading-relaxed shadow-sm">
+                                <strong>How to write this section:</strong> Pick ONE major pattern you found on your maps/graphs.<br>
+                                1. Start the paragraph by stating the pattern clearly.<br>
+                                2. Immediately follow it with 2-3 specific numbers from your graphs to prove it.<br>
+                                3. Next, explain <em>why</em> this happened (Step 5), using a geographic concept (from the engine on the right).<br>
+                                4. Finally (if L3), find a number that doesn't fit the rule, and explain why it's different.
+                            </div>
+
+                            <textarea id="draft-analysis" class="draft-box" placeholder="Write your paragraph here following the instructions above..."></textarea>
+                            
+                            <button onclick="requestFeedback('analysis')" class="mt-5 theme-bg px-6 py-4 rounded-xl font-bold text-lg w-full transition flex justify-center items-center gap-3 shadow-md hover:shadow-lg hover:-translate-y-0.5">
+                                Send Draft to Geo Mentor ✨
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Concepts Hub with Hover Interactive Sentences -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <div class="glass-card p-5 bg-white border shadow-sm">
+                            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-widest mb-2">Geographic Concepts Engine</h3>
+                            <p class="text-xs text-slate-500 mb-4">Hover over any conceptual framework element below to view definitions and <strong>context sentences</strong>:</p>
+                            
+                            <div class="space-y-3 font-sans">
+                                
+                                <div class="concept-hover">
+                                    <span class="text-purple-900 text-xs flex justify-between"><span>📍 Location</span> <span>➔</span></span>
+                                    <div class="concept-tooltip">
+                                        <span class="tooltip-title">Location</span>
+                                        <span class="tooltip-usage">The exact coordinates or relative position of a place on the Earth's surface.</span>
+                                        <strong class="text-white block mt-1 text-[11px] uppercase">NCEA Sentence Match:</strong>
+                                        <span class="tooltip-sentence">"The specific **Location** of the retail park on the junction of State Highway 1 provides optimal transport access for suburban commuters."</span>
+                                    </div>
+                                </div>
+
+                                <div class="concept-hover">
+                                    <span class="text-purple-900 text-xs flex justify-between"><span>📊 Patterns</span> <span>➔</span></span>
+                                    <div class="concept-tooltip">
+                                        <span class="tooltip-title">Patterns</span>
+                                        <span class="tooltip-usage">The systematic arrangement or design of features on the Earth's surface.</span>
+                                        <strong class="text-white block mt-1 text-[11px] uppercase">NCEA Sentence Match:</strong>
+                                        <span class="tooltip-sentence">"The distribution exhibits a clear linear **Pattern** following the primary transport infrastructure lines."</span>
+                                    </div>
+                                </div>
+
+                                <div class="concept-hover">
+                                    <span class="text-purple-900 text-xs flex justify-between"><span>👁️ Perception</span> <span>➔</span></span>
+                                    <div class="concept-tooltip">
+                                        <span class="tooltip-title">Perception</span>
+                                        <span class="tooltip-usage">How people view, interpret, and understand environments, often influenced by culture or economics.</span>
+                                        <strong class="text-white block mt-1 text-[11px] uppercase">NCEA Sentence Match:</strong>
+                                        <span class="tooltip-sentence">"The community's hazard **Perception** is highly skewed, with inland residents severely underestimating tsunami risks compared to coastal homeowners."</span>
+                                    </div>
+                                </div>
+
+                                <div class="concept-hover">
+                                    <span class="text-purple-900 text-xs flex justify-between"><span>🔄 Change</span> <span>➔</span></span>
+                                    <div class="concept-tooltip">
+                                        <span class="tooltip-title">Change</span>
+                                        <span class="tooltip-usage">The transformation of geographic characteristics across temporal or physical bounds.</span>
+                                        <strong class="text-white block mt-1 text-[11px] uppercase">NCEA Sentence Match:</strong>
+                                        <span class="tooltip-sentence">"Urban intensification has caused rapid spatial **Change** along the rural-urban boundary margins."</span>
+                                    </div>
+                                </div>
+
+                                <div class="concept-hover">
+                                    <span class="text-purple-900 text-xs flex justify-between"><span>🏞️ Environment</span> <span>➔</span></span>
+                                    <div class="concept-tooltip">
+                                        <span class="tooltip-title">Environment</span>
+                                        <span class="tooltip-usage">The distinct natural or cultural conditions defining specific space layout matrices.</span>
+                                        <strong class="text-white block mt-1 text-[11px] uppercase">NCEA Sentence Match:</strong>
+                                        <span class="tooltip-sentence">"The lower course of the river forms a low-energy **Environment** where reduced channel gradients create wide floodplains."</span>
+                                    </div>
+                                </div>
+
+                                <div class="concept-hover">
+                                    <span class="text-purple-900 text-xs flex justify-between"><span>📏 Distance</span> <span>➔</span></span>
+                                    <div class="concept-tooltip">
+                                        <span class="tooltip-title">Distance</span>
+                                        <span class="tooltip-usage">The spatial gap between two points, often dictating the level of interaction (distance-decay).</span>
+                                        <strong class="text-white block mt-1 text-[11px] uppercase">NCEA Sentence Match:</strong>
+                                        <span class="tooltip-sentence">"The concept of **Distance** is evident, as retail foot traffic decreases exponentially the further a store is situated from the central train station."</span>
+                                    </div>
+                                </div>
+
+                                <div class="concept-hover">
+                                    <span class="text-purple-900 text-xs flex justify-between"><span>🚪 Accessibility</span> <span>➔</span></span>
+                                    <div class="concept-tooltip">
+                                        <span class="tooltip-title">Accessibility</span>
+                                        <span class="tooltip-usage">How easily a place or resource can be reached or interacted with by people.</span>
+                                        <strong class="text-white block mt-1 text-[11px] uppercase">NCEA Sentence Match:</strong>
+                                        <span class="tooltip-sentence">"The high **Accessibility** of the inner-city zones drastically inflates housing prices compared to the poorly-connected peripheral suburbs."</span>
+                                    </div>
+                                </div>
+
+                                <div class="concept-hover">
+                                    <span class="text-purple-900 text-xs flex justify-between"><span>🧩 Regions</span> <span>➔</span></span>
+                                    <div class="concept-tooltip">
+                                        <span class="tooltip-title">Regions</span>
+                                        <span class="tooltip-usage">Areas defined by distinct, unifying natural or cultural characteristics.</span>
+                                        <strong class="text-white block mt-1 text-[11px] uppercase">NCEA Sentence Match:</strong>
+                                        <span class="tooltip-sentence">"The study area can be divided into two distinct **Regions**: the affluent coastal strip and the working-class industrial basin."</span>
+                                    </div>
+                                </div>
+
+                                <div class="concept-hover">
+                                    <span class="text-purple-900 text-xs flex justify-between"><span>⚙️ Processes</span> <span>➔</span></span>
+                                    <div class="concept-tooltip">
+                                        <span class="tooltip-title">Processes</span>
+                                        <span class="tooltip-usage">A sequence of geographic actions that shapes, alters, and transforms an area over time.</span>
+                                        <strong class="text-white block mt-1 text-[11px] uppercase">NCEA Sentence Match:</strong>
+                                        <span class="tooltip-sentence">"Longshore drift operates as a continuous transport **Process**, moving sediment down-drift along the headland face."</span>
+                                    </div>
+                                </div>
+
+                                <div class="concept-hover">
+                                    <span class="text-purple-900 text-xs flex justify-between"><span>🎭 Culture</span> <span>➔</span></span>
+                                    <div class="concept-tooltip">
+                                        <span class="tooltip-title">Culture</span>
+                                        <span class="tooltip-usage">The shared beliefs, values, and lifestyle practices of a specific demographic group.</span>
+                                        <strong class="text-white block mt-1 text-[11px] uppercase">NCEA Sentence Match:</strong>
+                                        <span class="tooltip-sentence">"The vibrant street art and diverse food markets reflect the unique multicultural **Culture** embedded within this specific urban zone."</span>
+                                    </div>
+                                </div>
+
+                                <div class="concept-hover">
+                                    <span class="text-purple-900 text-xs flex justify-between"><span>🔗 Interaction</span> <span>➔</span></span>
+                                    <div class="concept-tooltip">
+                                        <span class="tooltip-title">Interaction</span>
+                                        <span class="tooltip-usage">How natural elements and human environments link together, modifying each other over an area.</span>
+                                        <strong class="text-white block mt-1 text-[11px] uppercase">NCEA Sentence Match:</strong>
+                                        <span class="tooltip-sentence">"The high frequency of public transport usage demonstrates strong **Interaction** with lower-income suburbs, where residents rely on integrated bus networks for economic accessibility."</span>
+                                    </div>
+                                </div>
+
+                                <div class="concept-hover">
+                                    <span class="text-purple-900 text-xs flex justify-between"><span>🌱 Sustainability</span> <span>➔</span></span>
+                                    <div class="concept-tooltip">
+                                        <span class="tooltip-title">Sustainability</span>
+                                        <span class="tooltip-usage">The capacity of an environment to maintain systemic stability and support future output frameworks.</span>
+                                        <strong class="text-white block mt-1 text-[11px] uppercase">NCEA Sentence Match:</strong>
+                                        <span class="tooltip-sentence">"The current rate of suburban sprawl threatens the long-term environmental **Sustainability** of the community's greenbelt."</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="exemplar-box bg-white shadow-sm">
+                            <div class="flex flex-col gap-3 mb-4 border-b pb-3">
+                                <div class="flex justify-between items-center">
+                                    <h4 class="font-bold text-xs uppercase tracking-widest">Model Analysis Blocks</h4>
+                                    <button class="btn-copy py-1 px-2 text-[10px]" onclick="copyText('ex-analysis-text-plain', this)">📋 Copy Plain</button>
+                                </div>
+                                <select id="ex-analysis-select" onchange="changeExemplar('analysis')" class="text-xs border rounded p-1.5 bg-slate-50 w-full font-bold">
+                                    <option value="hazard">Hazard Perception Model</option>
+                                    <option value="transport">Transport Pattern Model</option>
+                                    <option value="housing">Housing Affordability Model</option>
+                                </select>
+                            </div>
+                            <div id="ex-analysis-text" class="text-xs text-slate-600 leading-relaxed font-medium"></div>
+                            <div id="ex-analysis-text-plain" class="hidden"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW 6: CONCLUSION ================= -->
+            <div id="view-conclusion" class="view-section hidden space-y-8 animate-in fade-in duration-500">
+                <div class="text-center max-w-3xl mx-auto mb-8">
+                    <h2 class="text-3xl font-black text-slate-900 mb-4">Drawing Your Research Conclusion</h2>
+                    <p class="text-lg text-slate-600">Your conclusion must explicitly answer your research aim, backed up by summary data from your findings.</p>
+                </div>
+
+                <div class="requires-lock-warning bg-amber-50 border border-amber-200 p-10 rounded-2xl text-center shadow-sm max-w-2xl mx-auto">
+                    <span class="text-6xl mb-4 block">🔒</span>
+                    <h3 class="font-bold text-amber-900 text-2xl mb-2">Topic Not Locked</h3>
+                    <p class="text-amber-800 text-base">Please establish your core topic lock to formulate summary layout constraints.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-8 content-requires-lock">
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="glass-card p-6 md:p-8 border-t-4 theme-border bg-gradient-to-br from-white to-slate-50">
+                            <h3 class="text-xl font-bold text-slate-900 mb-5">Conclusion Blueprint</h3>
+                            <div class="space-y-4 font-medium text-sm">
+                                <div class="bg-blue-100 p-4 rounded-xl border border-blue-300 shadow-sm flex gap-4 items-center">
+                                    <div class="bg-blue-600 text-white w-8 h-8 rounded-full flex justify-center items-center font-bold shrink-0 text-lg">1</div>
+                                    <div class="text-blue-900">
+                                        <span class="l2-only"><strong>Direct Answer:</strong> Answer your research aim clearly in your first sentence.</span>
+                                        <span class="l3-only"><strong>The Direct Thesis Statement:</strong> Answer your core research aim clearly in your very first opening sentence.</span>
+                                    </div>
+                                </div>
+                                <div class="bg-emerald-100 p-4 rounded-xl border border-emerald-300 shadow-sm flex gap-4 items-center">
+                                    <div class="bg-emerald-600 text-white w-8 h-8 rounded-full flex justify-center items-center font-bold shrink-0 text-lg">2</div>
+                                    <div class="text-emerald-900">
+                                        <span class="l2-only"><strong>Main Pattern:</strong> State the main spatial pattern you found across your study area.</span>
+                                        <span class="l3-only"><strong>The Overriding Pattern:</strong> Re-state the primary spatial distribution trend you uncovered across your entire study area.</span>
+                                    </div>
+                                </div>
+                                <div class="bg-purple-100 p-4 rounded-xl border border-purple-300 shadow-sm flex gap-4 items-center">
+                                    <div class="bg-purple-600 text-white w-8 h-8 rounded-full flex justify-center items-center font-bold shrink-0 text-lg">3</div>
+                                    <div class="text-purple-900">
+                                        <span class="l2-only"><strong>Use Evidence:</strong> Pick 2 or 3 of your best numbers or data points to prove your answer.</span>
+                                        <span class="l3-only"><strong>Empirical Synthesis:</strong> Select 2 or 3 of the most powerful key data points to summarise and prove your argument beyond doubt.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card p-6 md:p-8 bg-slate-50">
+                            <div class="flex justify-between items-center mb-4">
+                                <label class="text-base font-bold text-slate-800 uppercase tracking-widest">Draft Your Conclusion Summary:</label>
+                                <button onclick="copyText('draft-conclusion', this)" class="btn-copy">📋 Copy</button>
+                            </div>
+                            <textarea id="draft-conclusion" class="draft-box" placeholder="State your definitive research answers here, utilising summary statistics and explicit geographical contexts..."></textarea>
+                            <button onclick="requestFeedback('conclusion')" class="mt-5 theme-bg px-6 py-4 rounded-xl font-bold text-lg w-full transition flex justify-center items-center gap-3 shadow-md hover:shadow-lg hover:-translate-y-0.5">
+                                Send Conclusion to Geo Mentor ✨
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-1 space-y-6">
+                        <div class="exemplar-box mt-0 h-full bg-blue-50 border-blue-200 border-l-4 theme-border">
+                            <div class="flex flex-col gap-3 mb-4 border-b pb-3 border-blue-300">
+                                <div class="flex justify-between items-center">
+                                    <h4 class="font-bold text-blue-900 text-xs uppercase tracking-widest">Conclusion Exemplars</h4>
+                                </div>
+                                <select id="ex-conclusion-select" onchange="changeExemplar('conclusion')" class="text-xs border border-blue-300 rounded p-2 outline-none font-bold text-blue-800 bg-white cursor-pointer w-full">
+                                    <option value="hazard">Hazard Perception Context</option>
+                                    <option value="transport">Transport Pattern Context</option>
+                                    <option value="housing">Housing Affordability Context</option>
+                                </select>
+                            </div>
+                            <p id="ex-conclusion-text" class="text-sm text-blue-900 italic leading-relaxed bg-white/80 p-4 rounded border border-blue-100 shadow-inner"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW 7: EVALUATION ================= -->
+            <div id="view-evaluation" class="view-section hidden space-y-8 animate-in fade-in duration-500">
+                <div class="text-center max-w-3xl mx-auto mb-8">
+                    <h2 class="text-3xl font-black text-slate-900 mb-4">Critical Evaluation Workflow <span class="excellence-badge text-lg">E</span></h2>
+                    <p class="text-lg text-slate-600">
+                        <span class="l2-only">Fully explain the strength(s) and weakness(es) of your research process. Discuss how these impact the validity of your findings and suggest ways to improve.</span>
+                        <span class="l3-only">To reach Excellence, evaluate the reliability of your <strong>research process</strong>. Link data gaps directly to the overall <strong>validity</strong> of your conclusions and discuss alternative methods.</span>
+                    </p>
+                </div>
+
+                <div class="requires-lock-warning bg-amber-50 border border-amber-200 p-10 rounded-2xl text-center shadow-sm max-w-2xl mx-auto">
+                    <span class="text-6xl mb-4 block">🔒</span>
+                    <h3 class="font-bold text-amber-900 text-2xl mb-2">Topic Not Locked</h3>
+                    <p class="text-amber-800 text-base">Please lock in your project layout parameters to unlock the critical critique matrix tool.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-8 content-requires-lock">
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="glass-card p-6 md:p-8 border-t-4 border-t-slate-900 bg-gradient-to-br from-white to-slate-50">
+                            <h3 class="text-xl font-bold text-slate-900 mb-6">The Excellence Evaluation Framework</h3>
+                            <p class="text-sm text-slate-700 mb-4 font-bold border-l-4 border-amber-500 pl-3">Key point for Excellence: Your evaluation must continuously and explicitly link how strengths/weaknesses and alternative methods impact the ultimate validity and reliability of the final conclusions.</p>
+                            <div class="relative pl-8 border-l-2 border-slate-200 space-y-8 pb-2 text-sm font-medium mt-6">
+                                <div class="relative">
+                                    <div class="absolute -left-[46px] top-4 bg-slate-800 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm shadow border-2 border-white">1</div>
+                                    <div class="bg-slate-200 p-4 rounded-xl border border-slate-300 shadow-sm">
+                                        <h4 class="font-bold text-slate-900 text-base mb-1">Examine Strengths & Weaknesses (With Data)</h4>
+                                        <p class="text-slate-700 text-sm">
+                                            <span class="l2-only">Fully explain the strength(s) and weakness(es) of the research process...</span>
+                                            <span class="l3-only">Review your methodology. E.g., "A weakness was conducting surveys exclusively during work hours, capturing a sample size (n=45) heavily weighted towards retirees (68%)."</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="relative">
+                                    <div class="absolute -left-[46px] top-4 bg-amber-500 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm shadow border-2 border-white">2</div>
+                                    <div class="bg-amber-200 p-4 rounded-xl border border-amber-400 shadow-sm">
+                                        <h4 class="font-bold text-amber-900 text-base mb-1">Impact on Validity & Usefulness</h4>
+                                        <p class="text-amber-800 text-sm">
+                                            <span class="l2-only">How do these impact the validity? Do your findings give a true and representative view of the issue?</span>
+                                            <span class="l3-only">Explain how this affected your findings. E.g., "This temporal bias compromises the overall <span class="font-bold bg-amber-300 px-1 rounded">internal validity</span> of our conclusions. Our findings are not entirely useful for predicting commuter behaviour because the core working demographic was missed."</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="relative l2-only">
+                                    <div class="absolute -left-[46px] top-4 bg-emerald-500 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm shadow border-2 border-white">3</div>
+                                    <div class="bg-emerald-100 p-4 rounded-xl border border-emerald-300 shadow-sm">
+                                        <h4 class="font-bold text-emerald-900 text-base mb-1">Ways to Improve</h4>
+                                        <p class="text-emerald-800 text-sm">Discuss specific ways the research process could be improved to increase the reliability of the data next time.</p>
+                                    </div>
+                                </div>
+                                <div class="relative l3-only">
+                                    <div class="absolute -left-[46px] top-4 bg-purple-500 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm shadow border-2 border-white">3</div>
+                                    <div class="bg-purple-100 p-4 rounded-xl border border-purple-300 shadow-sm">
+                                        <h4 class="font-bold text-purple-900 text-base mb-1">Suggest Alternative Methods</h4>
+                                        <p class="text-purple-800 text-sm">E.g., "An alternative method involves executing a stratified digital survey, emailing QR codes directly to a mix of households across the three target census meshblocks."</p>
+                                    </div>
+                                </div>
+                                <div class="relative l3-only">
+                                    <div class="absolute -left-[46px] top-4 bg-emerald-500 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm shadow border-2 border-white">4</div>
+                                    <div class="bg-emerald-100 p-4 rounded-xl border border-emerald-300 shadow-sm">
+                                        <h4 class="font-bold text-emerald-900 text-base mb-1">Discuss Implications (Logistical, Ethical, Quality)</h4>
+                                        <p class="text-emerald-800 text-sm">State the effects of the alternative. E.g., "The <strong>implication</strong> of this alternative is that it drastically improves data quality and representativeness (elevating validity). However, the <strong>logistical effect</strong> on the researchers is a severe increase in cost and a lower guaranteed response rate compared to face-to-face intercepts."</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card p-6 md:p-8 bg-slate-50">
+                            <div class="flex justify-between items-center mb-4">
+                                <label class="text-base font-bold text-slate-800 uppercase tracking-widest">Draft Your Evaluation Section:</label>
+                                <button onclick="copyText('draft-evaluation', this)" class="btn-copy">📋 Copy</button>
+                            </div>
+                            <textarea id="draft-evaluation" class="draft-box" placeholder="Paste your evaluation here. Walk through your data constraints, connect them to validity limits, and explain alternative methods..."></textarea>
+                            <button onclick="requestFeedback('evaluation')" class="mt-5 theme-bg px-6 py-4 rounded-xl font-bold text-lg w-full transition flex justify-center items-center gap-3 shadow-md hover:shadow-lg hover:-translate-y-0.5">
+                                Send Evaluation to Geo Mentor ✨
+                            </button>
+                            <div id="fb-alert-evaluation" class="hidden mt-5 p-5 rounded-xl text-base border font-medium pop-alert"></div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-1 space-y-6">
+                        <div class="exemplar-box mt-0 h-full border-l-4 border-slate-700 bg-white shadow-sm">
+                            <div class="flex flex-col gap-3 mb-4 border-b pb-3">
+                                <div class="flex justify-between items-center">
+                                    <h4 class="font-bold text-slate-800 text-xs uppercase tracking-widest font-sans">Evaluation Exemplars</h4>
+                                    <button class="btn-copy py-1 px-2 text-[10px]" onclick="copyText('ex-evaluation-text-plain', this)">📋 Copy Plain</button>
+                                </div>
+                                <select id="ex-evaluation-select" onchange="changeExemplar('evaluation')" class="text-xs border border-slate-300 rounded p-2.5 outline-none font-bold text-slate-700 bg-slate-50 cursor-pointer w-full shadow-sm">
+                                    <option value="sample">Sampling Bias (Survey Demographics)</option>
+                                    <option value="time">Temporal Bias (Transport Counts)</option>
+                                </select>
+                            </div>
+                            <div id="ex-evaluation-text" class="text-sm text-slate-700 bg-slate-50 p-4 rounded border italic leading-relaxed text-left shadow-inner"></div>
+                            <div id="ex-evaluation-text-plain" class="hidden"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW 8: FINAL PRESENTATION ================= -->
+            <div id="view-final" class="view-section hidden space-y-8 animate-in fade-in duration-500">
+                <div class="text-center max-w-3xl mx-auto mb-8">
+                    <h2 class="text-3xl font-black text-slate-900 mb-4">Final Presentation Assembly</h2>
+                    <p class="text-lg text-slate-600">Your research must be compiled into a logical, professional format. Seamlessly integrating your text and visuals is critical for an <strong class="text-amber-600">Excellence</strong> grade.</p>
+                </div>
+
+                <div class="requires-lock-warning bg-amber-50 border border-amber-200 p-10 rounded-2xl text-center shadow-sm max-w-2xl mx-auto">
+                    <span class="text-6xl mb-4 block">🔒</span>
+                    <h3 class="font-bold text-amber-900 text-2xl mb-2">Topic Not Locked</h3>
+                    <p class="text-amber-800 text-base">Please establish your core topic lock to view final presentation layouts.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-8 content-requires-lock">
+                    <div class="space-y-6">
+                        <div class="glass-card p-6 md:p-8 border-t-4 border-t-[var(--geo-purple)]">
+                            <h3 class="text-xl font-bold text-slate-900 mb-5">Structuring Your Report Integration</h3>
+                            <div class="space-y-4 font-medium text-sm">
+                                <div class="flex gap-4 items-start bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
+                                    <div class="bg-purple-100 text-purple-800 font-bold px-3 py-1 rounded shadow-sm shrink-0">1. Intro</div>
+                                    <p class="text-slate-700 mt-1">Title, Name, and your explicit <strong>Research Aim</strong>. Include a basic orientation map showing where your study took place in NZ.</p>
+                                </div>
+                                <div class="flex gap-4 items-start bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
+                                    <div class="bg-purple-100 text-purple-800 font-bold px-3 py-1 rounded shadow-sm shrink-0">2. Method</div>
+                                    <p class="text-slate-700 mt-1">Summarise your planning and data collection. Photos of you in the field using equipment add strong authenticity.</p>
+                                </div>
+                                <div class="flex gap-4 items-start bg-blue-50 p-4 rounded-xl border border-blue-200 shadow-md transform hover:scale-[1.01] transition-transform">
+                                    <div class="bg-blue-600 text-white font-bold px-3 py-1 rounded shadow-sm shrink-0">3. Integration (Crucial)</div>
+                                    <p class="text-blue-900 mt-1 leading-relaxed"><strong>Do NOT dump all maps/graphs at the start and all text at the end.</strong> Format your report so that your specific Map or Graph sits directly beside the Analysis paragraph explaining it. This proves spatial processing.</p>
+                                </div>
+                                <div class="flex gap-4 items-start bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
+                                    <div class="bg-purple-100 text-purple-800 font-bold px-3 py-1 rounded shadow-sm shrink-0">4. Wrap Up</div>
+                                    <p class="text-slate-700 mt-1">Your <strong>Conclusion</strong> answering the aim, followed directly by your <strong>Evaluation</strong> of the methodology's validity.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="glass-card bg-emerald-50 border-emerald-200 shadow-sm">
+                            <h3 class="font-bold text-emerald-900 text-sm uppercase tracking-widest mb-4">Final Pre-Submission Checklist</h3>
+                            <div class="flex flex-col gap-3 text-sm font-medium text-slate-800">
+                                <label class="flex items-center gap-3 bg-white p-3 border rounded shadow-sm hover:border-emerald-400 transition-colors cursor-pointer"><input type="checkbox" class="accent-emerald-600 w-5 h-5"> <strong>Title Page</strong> (Topic Title, Standard number, Name)</label>
+                                <label class="flex items-center gap-3 bg-white p-3 border rounded shadow-sm hover:border-emerald-400 transition-colors cursor-pointer"><input type="checkbox" class="accent-emerald-600 w-5 h-5"> <strong>Aim and Methodology</strong></label>
+                                <label class="flex items-center gap-3 bg-white p-3 border rounded shadow-sm hover:border-emerald-400 transition-colors cursor-pointer"><input type="checkbox" class="accent-emerald-600 w-5 h-5"> <strong>Presentations</strong> (All graphs, photos, maps numbered and in logical order)</label>
+                                <label class="flex items-center gap-3 bg-white p-3 border rounded shadow-sm hover:border-emerald-400 transition-colors cursor-pointer"><input type="checkbox" class="accent-emerald-600 w-5 h-5"> <strong>Analysis / Findings</strong></label>
+                                <label class="flex items-center gap-3 bg-white p-3 border rounded shadow-sm hover:border-emerald-400 transition-colors cursor-pointer"><input type="checkbox" class="accent-emerald-600 w-5 h-5"> <strong>Conclusion</strong></label>
+                                <label class="flex items-center gap-3 bg-white p-3 border rounded shadow-sm hover:border-emerald-400 transition-colors cursor-pointer"><input type="checkbox" class="accent-emerald-600 w-5 h-5"> <strong>Evaluation</strong></label>
+                                <label class="flex items-center gap-3 bg-white p-3 border rounded shadow-sm hover:border-emerald-400 transition-colors cursor-pointer"><input type="checkbox" class="accent-emerald-600 w-5 h-5"> <strong>Appendix</strong> (Raw data tables, blank surveys)</label>
+                            </div>
+                        </div>
+
+                        <div class="glass-card border-t-4 border-slate-800 bg-white shadow-sm">
+                            <h3 class="text-sm font-bold text-slate-900 mb-3 uppercase tracking-widest">Excellence Digital Mediums</h3>
+                            <ul class="text-xs text-slate-600 space-y-3 leading-relaxed">
+                                <li class="p-3 bg-slate-50 rounded border">
+                                    <strong class="text-emerald-600 block mb-1 text-sm">ArcGIS StoryMaps</strong>
+                                    Highly Recommended. Allows interactive, scrolling GIS maps with your analysis text floating cleanly alongside. Perfect for spatial storytelling.
+                                </li>
+                                <li class="p-3 bg-slate-50 rounded border">
+                                    <strong class="text-slate-800 block mb-1 text-sm">Written Report (Docs/Word)</strong>
+                                    Traditional format. Use "Wrap Text" on all inserted images so your graphs sit cleanly beside your corresponding paragraphs, preventing massive blocks of unbroken text.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW 9: NZQA EXEMPLARS ================= -->
+            <div id="view-nzqa" class="view-section hidden space-y-8 animate-in fade-in duration-500">
+                <div class="text-center max-w-3xl mx-auto mb-8">
+                    <h2 class="text-3xl font-black text-slate-900 mb-4">Official NZQA Exemplars</h2>
+                    <p class="text-lg text-slate-600">Review past student portfolios that have been officially graded by NZQA moderators.</p>
+                </div>
+
+                <div class="max-w-2xl mx-auto glass-card border-t-4 theme-border-t shadow-lg text-center p-10">
+                    <div class="text-6xl mb-6">📚</div>
+                    <h3 class="text-2xl font-bold text-slate-800 mb-4">Past Student Submissions</h3>
+                    <p class="text-slate-600 mb-8">Click below to open the official NZQA portal and review authentic 'Excellence' graded research assessments for your specific level.</p>
+                    
+                    <div class="l2-only">
+                        <a href="https://www2.nzqa.govt.nz/ncea/subjects/past-exams-and-exemplars/geography/as-91244/" target="_blank" class="theme-bg px-8 py-4 rounded-xl font-bold text-lg shadow-md inline-block hover:-translate-y-0.5 transition w-full sm:w-auto">
+                            View Level 2 Exemplars (AS91244) ↗
+                        </a>
+                    </div>
+                    
+                    <div class="l3-only">
+                        <a href="https://www2.nzqa.govt.nz/ncea/subjects/past-exams-and-exemplars/geography/as-91430/" target="_blank" class="theme-bg px-8 py-4 rounded-xl font-bold text-lg shadow-md inline-block hover:-translate-y-0.5 transition w-full sm:w-auto">
+                            View Level 3 Exemplars (AS91430) ↗
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        
+        <footer class="mt-16 pt-10 border-t border-slate-300 text-center text-slate-500 text-sm pb-10">
+            <p>© 2026 GeoResearch Student Dashboard</p>
+            <p class="text-xs mt-2 font-medium">Aligned with NZQA Level 2 & Level 3 Geography Research Standards (AS91244 & AS91430).</p>
+        </footer>
+    </div>
+    
+    <!-- ================= MODALS & OVERLAYS ================= -->
+    
+    <div id="aim-advice-modal" class="modal-overlay">
+        <div class="modal-content shadow-2xl" id="aim-modal-content">
+            <div id="aim-modal-header" class="p-6 text-white bg-[var(--geo-primary)]">
+                <h3 class="text-2xl font-bold flex items-center gap-3"><span id="aim-modal-icon">💡</span> <span id="aim-modal-title">Aim Analysis</span></h3>
+            </div>
+            <div class="p-8 bg-white">
+                <div id="aim-modal-text" class="text-slate-700 text-lg leading-relaxed font-medium mb-8"></div>
+                <div class="flex justify-end gap-4 pt-5 border-t border-slate-200">
+                    <button onclick="closeAimModal()" class="px-6 py-3 text-slate-600 hover:bg-slate-100 rounded-lg font-bold text-base transition border border-slate-300 shadow-sm">Edit Aim Layout</button>
+                    <button id="btn-modal-lock" onclick="lockTopicFromModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-lg font-bold text-base transition shadow-md hidden flex items-center gap-2">Lock In Target Topic 📌</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="export-overlay" class="modal-overlay">
+        <div class="modal-content bg-white rounded-xl shadow-2xl p-8 max-w-3xl w-full">
+            <h3 class="text-3xl font-bold text-slate-900 mb-2">Compiled Notebook Drafts</h3>
+            <p class="text-sm text-slate-600 mb-4">Copy this text block to paste directly into Google Docs or Microsoft Word.</p>
+            <textarea id="export-text" class="w-full h-80 p-4 border-2 border-slate-300 rounded-lg font-mono text-xs outline-none focus:border-[var(--geo-primary)] custom-scrollbar" readonly></textarea>
+            <div class="mt-6 flex justify-end gap-4 pt-4 border-t border-slate-100">
+                <button onclick="closeExportModal()" class="px-5 py-2.5 text-slate-600 hover:bg-slate-100 rounded-lg font-bold text-sm border border-slate-300 shadow-sm transition">Close Panel</button>
+                <button onclick="copyExportText(this)" class="theme-bg px-6 py-2.5 rounded-lg font-bold text-sm text-white shadow-md transition-all flex items-center gap-2 hover:-translate-y-0.5"><span>📋</span> Copy Portfolio</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Chat Widget -->
+    <div class="chat-widget">
+        <div id="chat-panel" class="chat-panel">
+            <div class="p-4 bg-[var(--geo-dark)] text-white border-b border-[var(--geo-primary)] flex justify-between items-center shadow-sm">
+                <h3 class="font-bold text-sm flex items-center gap-2"><span>🧑‍🏫</span> Geo Mentor Assistant</h3>
+                <button onclick="toggleChat()" class="text-white/70 hover:text-white text-2xl leading-none transition focus:outline-none">&times;</button>
+            </div>
+            <div class="chat-messages custom-scrollbar" id="chat-global">
+                <div class="msg-mentor">Welcome to your workspace dashboard. I monitor text layout metrics. Use the individual tab 'Review' buttons to generate expert moderation prompt sheets for Gemini!</div>
+            </div>
+            <div class="chat-input-area p-2.5 bg-white border-t">
+                <input type="text" id="input-global" class="chat-input" placeholder="Ask a general guidelines question..." onkeypress="if(event.key === 'Enter') submitChat()">
+                <button class="mentor-send shadow-sm px-3" onclick="submitChat()">Send</button>
+            </div>
+        </div>
+        <button id="chat-fab" class="chat-fab" onclick="toggleChat()">💬</button>
+    </div>
+
+    <!-- ================= CODE LOGIC CORE ================= -->
+    <script>
+        // --- State Variables ---
+        let currentLevel = 3; 
+        let isTopicLocked = false;
+        let currentTopic = "";
+        let globalChartInstance = null;
+
+        // --- Embedded Notification Handler ---
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            let icon = 'ℹ️';
+            if (type === 'success') icon = '✅';
+            if (type === 'error') icon = '❌';
+            toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 50);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // --- Initialization ---
+        function init() {
+            loadState();
+            setLevel(currentLevel);
+            if (isTopicLocked) {
+                document.getElementById('draft-topic').value = currentTopic;
+                lockTopicUI();
+            } else {
+                updateLockState();
+            }
+            switchView('aim');
+            setupTextareaSync();
+            switchSubTab('data', 'human');
+            setTimeout(() => {
+                renderSpecificChart();
+                updateMapDisplay();
+                updateVisualDisplay();
+            }, 200);
+        }
+
+        function loadState() {
+            try {
+                const dataStore = localStorage.getItem('geoHubStateV2026_final_v8'); 
+                if (dataStore) {
+                    const parsed = JSON.parse(dataStore);
+                    currentLevel = parsed.level || 3;
+                    isTopicLocked = parsed.isLocked || false;
+                    currentTopic = parsed.topic || "";
+                    const steps = ['plan', 'analysis', 'conclusion', 'evaluation'];
+                    steps.forEach(s => {
+                        const box = document.getElementById('draft-' + s);
+                        if (box && parsed.drafts && parsed.drafts[s]) box.value = parsed.drafts[s];
+                    });
+                }
+            } catch (e) {}
+        }
+
+        function saveState() {
+            const drafts = {};
+            const steps = ['plan', 'analysis', 'conclusion', 'evaluation'];
+            steps.forEach(s => {
+                const box = document.getElementById('draft-' + s);
+                if (box) drafts[s] = box.value;
+            });
+            localStorage.setItem('geoHubStateV2026_final_v8', JSON.stringify({
+                level: currentLevel, isLocked: isTopicLocked, topic: currentTopic, drafts: drafts
+            }));
+        }
+
+        function setupTextareaSync() {
+            document.querySelectorAll('textarea.draft-box').forEach(ta => {
+                ta.addEventListener('input', () => {
+                    clearTimeout(ta.saveTimeout);
+                    ta.saveTimeout = setTimeout(saveState, 800);
+                });
+            });
+        }
+
+        function populateAim(text) {
+            document.getElementById('draft-topic').value = text;
+            checkAim();
+            showNotification("Topic populated. Click Lock In Workflow to confirm.", "info");
+        }
+
+        // --- Dynamic Level Control ---
+        function setLevel(lvl) {
+            currentLevel = lvl;
+            document.body.setAttribute('data-level', lvl);
+            const btn2 = document.getElementById('btn-lvl-2');
+            const btn3 = document.getElementById('btn-lvl-3');
+            if (lvl === 2) {
+                btn2.className = "px-5 py-2.5 rounded-md font-bold text-sm bg-white text-teal-700 shadow-md transition-all";
+                btn3.className = "px-5 py-2.5 rounded-md font-bold text-sm text-white/70 hover:text-white bg-transparent transition-all";
+                document.getElementById('header-subtitle').innerText = "Conduct Geographic Research (2.5)";
+            } else {
+                btn3.className = "px-5 py-2.5 rounded-md font-bold text-sm bg-white text-blue-600 shadow-md transition-all";
+                btn2.className = "px-5 py-2.5 rounded-md font-bold text-sm text-white/70 hover:text-white bg-transparent transition-all";
+                document.getElementById('header-subtitle').innerText = "Conduct Geographic Research (3.5)";
+            }
+            saveState();
+            changeExemplar('analysis'); 
+            changeExemplar('evaluation');
+            if (isTopicLocked) updateDynamicAdvice();
+        }
+
+        // --- View Switching (SPA Architecture) ---
+        function switchView(viewId) {
+            if (!isTopicLocked && viewId !== 'aim' && viewId !== 'nzqa') {
+                const box = document.getElementById('aim-input-container');
+                if (box) {
+                    box.classList.add('scale-[1.01]', 'border-red-400');
+                    setTimeout(() => box.classList.remove('scale-[1.01]', 'border-red-400'), 400);
+                }
+                showNotification("Workflow Locked: Establish your topic aim first.", "error");
+                return;
+            }
+
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+
+            const targetView = document.getElementById('view-' + viewId);
+            const targetBtn = document.getElementById(`nav-${viewId}`);
+            if (targetView) targetView.classList.remove('hidden');
+            if (targetBtn) targetBtn.classList.add('active');
+
+            if (viewId === 'presentation') {
+                setTimeout(() => { 
+                    renderSpecificChart();
+                    updateMapDisplay(); 
+                    updateVisualDisplay();
+                }, 50);
+            }
+        }
+
+        function switchSubTab(group, tabId) {
+            document.querySelectorAll(`.sub-content-${group}`).forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll(`.sub-btn-${group}`).forEach(btn => btn.classList.remove('active'));
+            const target = document.getElementById(`sub-${group}-${tabId}`);
+            if (target) target.classList.remove('hidden');
+            const btn = document.getElementById(`sub-btn-${group}-${tabId}`);
+            if (btn) btn.classList.add('active');
+        }
+
+        // --- Workflow Verification Hub ---
+        function updateLockState() {
+            if (isTopicLocked) document.body.classList.remove('locked-mode');
+            else document.body.classList.add('locked-mode');
+        }
+
+        function checkAim() {
+            const input = document.getElementById('draft-topic').value.trim();
+            if (!input) { showNotification("Please draft an inquiry string inside the topic box.", "error"); return; }
+            const lower = input.toLowerCase();
+            const spatialTriggers = ['spatial', 'variation', 'distribution', 'pattern', 'gradient', 'decay', 'transect', 'comparison', 'zone', 'profile', 'network', 'node', 'between', 'across'];
+            const hasSpatial = spatialTriggers.some(word => lower.includes(word));
+            const modal = document.getElementById('aim-advice-modal');
+            const header = document.getElementById('aim-modal-header');
+            const title = document.getElementById('aim-modal-title');
+            const icon = document.getElementById('aim-modal-icon');
+            const text = document.getElementById('aim-modal-text');
+            const lockBtn = document.getElementById('btn-modal-lock');
+            modal.classList.add('show');
+            if (hasSpatial) {
+                header.className = "p-6 text-white bg-emerald-600";
+                icon.innerText = "🔱"; title.innerText = "Geographic Paradigm Validated";
+                text.innerHTML = `Your aim framework contains structural spatial keywords:<br><br><em class="text-slate-800 text-base border-l-4 border-emerald-500 pl-4 py-1.5 bg-slate-50 font-mono block">"${input}"</em><br>This focus enables proper cartographic processing. You can lock this in to open your digital workbook.`;
+                lockBtn.classList.remove('hidden');
+            } else {
+                header.className = "p-6 text-white bg-amber-500";
+                icon.innerText = "⚠️"; title.innerText = "Missing Spatial Parameter";
+                text.innerHTML = `Your structural description currently lacks key spatial sorting indicators:<br><br><em class="text-slate-800 text-base border-l-4 border-amber-500 pl-4 py-1.5 bg-slate-50 font-mono block">"${input}"</em><br>NCEA standards specify that geographic research must evaluate structural layouts across environments. Re-frame using terms like <strong>"spatial variation between nodes"</strong> or <strong>"distribution patterns across zones"</strong>.`;
+                lockBtn.classList.add('hidden');
+            }
+        }
+
+        function closeAimModal() { document.getElementById('aim-advice-modal').classList.remove('show'); }
+
+        function lockTopicFromModal() {
+            closeAimModal();
+            const val = document.getElementById('draft-topic').value.trim();
+            if (!val) return;
+            currentTopic = val; isTopicLocked = true;
+            saveState(); lockTopicUI();
+            showNotification("Topic workflow correctly initialised.", "success");
+        }
+
+        function lockTopicUI() {
+            document.getElementById('aim-input-container').classList.add('hidden');
+            document.getElementById('locked-aim-display').classList.remove('hidden');
+            document.getElementById('locked-topic-text').innerText = currentTopic;
+            updateLockState(); updateDynamicAdvice();
+        }
+
+        function unlockTopic() {
+            isTopicLocked = false; saveState();
+            document.getElementById('aim-input-container').classList.remove('hidden');
+            document.getElementById('locked-aim-display').classList.add('hidden');
+            updateLockState(); showNotification("Topic unlocked. Editor access restricted.", "info");
+        }
+
+        // --- Sophisticated Dynamic Heuristic Engine ---
+        function updateDynamicAdvice() {
+            const lowerTopic = currentTopic.toLowerCase();
+            const isPhysical = /river|coast|beach|weather|climate|vegetation|soil|altitude|profile|dune|wave|stream|erosion|water|temperature/.test(lowerTopic);
+            const isHuman = /retail|traffic|transport|crime|socioeconomic|population|demographic|fast-food|urban|cbd|tourism|perception|people|resident|income|affordability|hazard|sustainable/.test(lowerTopic);
+            const isLinear = /profile|distance|transect|gradient|downstream|along|from/.test(lowerTopic);
+            
+            // Generate Contextual Plan Tips
+            let planHtml = `<li><strong>Geographic Bounds:</strong> Explicitly map out the unique tracking coordinates or boundaries for each distinct observation node in your methodology.</li>`;
+            if (isPhysical) {
+                planHtml += `<li><strong>Instrumentation:</strong> Detail exact equipment calibration rules (e.g., zeroing clinometers) and step-by-step physical deployment instructions.</li>`;
+                planHtml += `<li><strong>Reliability Rules:</strong> Ensure you plan to take at least 3 repeat readings at every measurement point to average out environmental anomalies.</li>`;
+            } else if (isHuman) {
+                planHtml += `<li><strong>Demographics & Timing:</strong> Specify exact survey times (e.g., peak vs off-peak hours) and your participant sampling method (e.g., systematic every 5th person).</li>`;
+                planHtml += `<li><strong>Spatial Equity:</strong> Ensure you plan to collect an equal sample size (n) across all your comparative zones to prevent biased weighting.</li>`;
+            } else {
+                planHtml += `<li><strong>Reliability Checks:</strong> Plan for at least 3 distinct data collection windows or trials to ensure data consistency.</li><li><strong>Equipment/Method:</strong> Clearly list every tool, survey, or secondary dataset you will use.</li>`;
+            }
+            
+            // Generate Contextual Data Tips
+            let dataHtml = `<li><strong>Spatial Tagging:</strong> Ensure every single piece of data you collect has a column identifying its exact "Location/Node". Without this, you cannot map it!</li>`;
+            dataHtml += `<li><strong>Perception Surveys:</strong> Regardless of your topic, designing a robust survey (using 1-5 Likert scales) is an excellent way to capture public perspectives and map spatial variations in human behaviour.</li>`;
+            if (isPhysical) {
+                dataHtml += `<li><strong>Physical Structuring:</strong> Set up your matrices to record raw metrics (e.g. mm, degrees, m/s) across multiple trials so you can calculate a rolling average later.</li>`;
+                if(isLinear) dataHtml += `<li><strong>Linear Chainage:</strong> Log the exact distance from the origin point (0m) for every single measurement.</li>`;
+            } else if (isHuman) {
+                dataHtml += `<li><strong>Tally Synchronisation:</strong> Ensure all pedestrian/traffic tallies are run synchronously for exactly the same duration (e.g., exactly 10 mins).</li>`;
+            }
+            
+            // Generate Contextual Pres Tips
+            let presHtml = `<li><strong>Data Processing:</strong> Do not graph raw tallies or lists. Convert your data into percentages, averages, or indices before rendering.</li>`;
+            if (isPhysical) {
+                presHtml += `<li><strong>Physical Charts:</strong> Scatter plots with trendlines or Line profiles are excellent for showing continuous physical change over a distance or transect.</li>`;
+                presHtml += `<li><strong>Physical Maps:</strong> Proportional symbols or Isoline maps work best for mapping physical measurements like wind speed or elevation.</li>`;
+            } else if (isHuman) {
+                presHtml += `<li><strong>Human Charts:</strong> Use 100% Stacked Bar charts or Grouped Bar charts to compare differing zones or survey responses side-by-side.</li>`;
+                presHtml += `<li><strong>Human Maps:</strong> Choropleth maps are ideal for mapping density levels, EQI scores, or socioeconomic zoning perceptions.</li>`;
+            } else {
+                presHtml += `<li><strong>Best Fit:</strong> Choose the graph that best matches your data type (e.g., Pie charts for composition, Bar charts for comparison).</li>`;
+            }
+            
+            // Generate Contextual Analysis Tips
+            let analysisHtml = `<li><strong>Pattern Identification:</strong> Open your paragraph by explicitly stating the overarching spatial trend (e.g., clustered, linear, distance-decay).</li>`;
+            analysisHtml += `<li><strong>Empirical Proof:</strong> You must integrate direct evidence from your graphs—quote at least 2-3 specific numbers or percentages to prove the pattern.</li>`;
+            if (isHuman) {
+                analysisHtml += `<li><strong>Concept Integration:</strong> Use geographic concepts like <em>Interaction</em> or <em>Perspectives</em> to explain the human behaviours or economic rules driving this pattern.</li>`;
+            } else if (isPhysical) {
+                analysisHtml += `<li><strong>Concept Integration:</strong> Use the geographic concept of <em>Processes</em> to explain the natural or environmental forces (e.g., wave energy, hydrology) causing this pattern.</li>`;
+            } else {
+                analysisHtml += `<li><strong>Explanation (The Why):</strong> Explicitly explain the geographical reasons behind *why* this specific pattern exists in this specific location.</li>`;
+            }
+
+            // Inject HTML
+            const ePlan = document.getElementById('dyn-advice-plan');
+            const eData = document.getElementById('dyn-advice-data');
+            const ePres = document.getElementById('dyn-advice-pres');
+            const eAnalysis = document.getElementById('dyn-advice-analysis');
+            
+            if(ePlan) ePlan.innerHTML = planHtml;
+            if(eData) eData.innerHTML = dataHtml;
+            if(ePres) ePres.innerHTML = presHtml;
+            if(eAnalysis) eAnalysis.innerHTML = analysisHtml;
+            
+            changeExemplar('plan');
+            changeExemplar('conclusion');
+            changeExemplar('evaluation');
+        }
+
+        // --- Exemplar Swapping Control ---
+        function changeExemplar(stage) {
+            const selector = document.getElementById(`ex-${stage}-select`);
+            const target = document.getElementById(`ex-${stage}-text`);
+            const plainTextTarget = document.getElementById(`ex-${stage}-text-plain`);
+            
+            if (!selector || !target) return;
+            const chosen = selector.value;
+
+            if (stage === 'plan') {
+                if (chosen === 'hazard') target.innerHTML = `<strong>When/Where:</strong> On Tuesday, 12th March, between 09:00 AM and 14:00 PM, our group will establish systematic survey points across two distinct socio-economic zones: Coastal Zone A (High Risk) and Inland Zone B (Low Risk).<br><br><strong>How/Who:</strong> At each node, Student A will execute a structured 10-question digital perception survey using ArcGIS Survey123 on an iPad. The sampling method will be systematic; we will intercept every 5th pedestrian walking past the designated intersection until a reliable sample size quota (n=40) is reached for both zones. Student B will simultaneously take annotated field photos to verify the built environment context.`;
+                if (chosen === 'transport') target.innerHTML = `<strong>When/Where:</strong> Data collection will occur in the Auckland CBD and suburban fringe on Thursday, 15th August. We will implement bipolar, synchronised pedestrian and traffic tracking counts at 4 specific intersections (e.g., Queen St Transit Hub vs. Suburban Retail Park).<br><br><strong>How/Who:</strong> To capture temporal variation, counts will be conducted precisely from 08:30-08:45 (morning peak), 12:00-12:15 (midday), and 15:30-15:45 (afternoon peak). Group members will be stationed at diagonal street corners, using mechanical clickers to tally passing demographics. Following each 15-minute window, we will conduct a perception survey using Likert scales (1-5) to assess commuter satisfaction with local transport infrastructure.`;
+                if (chosen === 'housing') target.innerHTML = `<strong>When/Where:</strong> Fieldwork will be conducted across three distinct census meshblocks (Core CBD, Inner Suburb, Outer Periphery) on Wednesday, 4th April, commencing exactly at 10:15 AM.<br><br><strong>How/Who:</strong> We will execute a mixed-methods approach. Student A and B will conduct door-to-door resident perception surveys regarding living costs using a stratified random sample (10 houses per street). Concurrently, Student C will conduct secondary data cross-referencing by logging real-time property lease values from local real estate agencies in the area, processing these into a median affordability index for each meshblock to ensure data validity.`;
+            }
+            else if (stage === 'analysis') {
+                if (chosen === 'hazard') {
+                    target.innerHTML = `
+                        <p><span class="p-1 rounded bg-slate-800 text-white font-bold text-[10px]">1. Pattern</span> The spatial arrangement of community hazard preparedness demonstrates a distinct distance-decay pattern, where readiness levels drop exponentially as residential distance from the coastline increases.</p>
+                        <p class="mt-2"><span class="p-1 rounded bg-emerald-600 text-white font-bold text-[10px]">4. Evidence</span> Data analysis of Survey Map 2 confirms that Coastal Zone A exhibits a mean preparedness score of 4.5/5 (Highly Prepared), whereas the inland periphery of Zone B drops to a mean score of only 2.1/5.</p>
+                        <p class="mt-2"><span class="p-1 rounded bg-indigo-600 text-white font-bold text-[10px]">5. Explanation</span> Why do we get these results? Proximity to the physical hazard forces a heightened daily awareness of the threat environment. Coastal residents receive frequent council warnings and physically observe the ocean daily, reinforcing proactive survival behaviours.</p>
+                        <p class="mt-2"><span class="p-1 rounded bg-blue-600 text-white font-bold text-[10px]">2. Concept</span> This stark distribution physically proves the core concept of varying <strong>Perspectives</strong>. Communities form environmental viewpoints based entirely on their immediate geographic exposure to risk.</p>
+                        <p class="l3-only mt-2"><span class="p-1 rounded bg-amber-500 text-white font-bold text-[10px]">3. Anomaly</span> <strong>Level 3 Anomaly:</strong> However, a significant localised irregularity occurs at Node B-4 (Inland Retirement Village). Despite being 10km inland, this node scored 4.2/5 for preparedness. This anomaly is driven by institutional vulnerability; the village management enforces strict, mandatory quarterly evacuation drills regardless of physical location.</p>
+                    `;
+                    if (plainTextTarget) plainTextTarget.textContent = "The spatial arrangement of community hazard preparedness demonstrates a distinct distance-decay pattern, where readiness levels drop exponentially as residential distance from the coastline increases. Data analysis of Survey Map 2 confirms that Coastal Zone A exhibits a mean preparedness score of 4.5/5 (Highly Prepared), whereas the inland periphery of Zone B drops to a mean score of only 2.1/5. Why do we get these results? Proximity to the physical hazard forces a heightened daily awareness of the threat environment. Coastal residents receive frequent council warnings and physically observe the ocean daily, reinforcing proactive survival behaviours. This stark distribution physically proves the core concept of varying Perspectives. Communities form environmental viewpoints based entirely on their immediate geographic exposure to risk. However, a significant localised irregularity occurs at Node B-4 (Inland Retirement Village). Despite being 10km inland, this node scored 4.2/5 for preparedness. This anomaly is driven by institutional vulnerability; the village management enforces strict, mandatory quarterly evacuation drills regardless of physical location.";
+                } else if (chosen === 'transport') {
+                    target.innerHTML = `
+                        <p><span class="p-1 rounded bg-slate-800 text-white font-bold text-[10px]">1. Pattern</span> The spatial arrangement of public transport utilisation demonstrates a highly centralised core-periphery pattern, heavily concentrated along primary arterial transit corridors.</p>
+                        <p class="mt-2"><span class="p-1 rounded bg-emerald-600 text-white font-bold text-[10px]">4. Evidence</span> Data analysis of Map Segment 2 confirms that the CBD Core exhibits a pedestrian flow density of 1,450 commuters/hr, whereas the suburban periphery contains a floor of only 120 commuters/hr.</p>
+                        <p class="mt-2"><span class="p-1 rounded bg-indigo-600 text-white font-bold text-[10px]">5. Explanation</span> Why do we get these results? Planners utilise accessibility models, ensuring transit hubs are positioned where infrastructure convergence naturally forces high-density human movement, maximising civic efficiency.</p>
+                        <p class="mt-2"><span class="p-1 rounded bg-blue-600 text-white font-bold text-[10px]">2. Concept</span> This stark distribution physically proves the core concept of <strong>Interaction</strong>. Transport infrastructure deliberately interacts with economic employment zones, altering the cultural environment's flow.</p>
+                        <p class="l3-only mt-2"><span class="p-1 rounded bg-amber-500 text-white font-bold text-[10px]">3. Anomaly</span> <strong>Level 3 Anomaly:</strong> However, a significant localised irregularity occurs at Node 3 (Suburban Tech Park). Despite being in the periphery, it displays high transit use (800/hr). This anomaly is driven by a bespoke corporate shuttle service implemented in 2023, bypassing standard city network limitations.</p>
+                    `;
+                    if (plainTextTarget) plainTextTarget.textContent = "The spatial arrangement of public transport utilisation demonstrates a highly centralised core-periphery pattern, heavily concentrated along primary arterial transit corridors. Data analysis of Map Segment 2 confirms that the CBD Core exhibits a pedestrian flow density of 1,450 commuters/hr, whereas the suburban periphery contains a floor of only 120 commuters/hr. Why do we get these results? Planners utilise accessibility models, ensuring transit hubs are positioned where infrastructure convergence naturally forces high-density human movement, maximising civic efficiency. This stark distribution physically proves the core concept of Interaction. Transport infrastructure deliberately interacts with economic employment zones, altering the cultural environment's flow. However, a significant localised irregularity occurs at Node 3 (Suburban Tech Park). Despite being in the periphery, it displays high transit use (800/hr). This anomaly is driven by a bespoke corporate shuttle service implemented in 2023, bypassing standard city network limitations.";
+                } else if (chosen === 'housing') {
+                    target.innerHTML = `
+                        <p><span class="p-1 rounded bg-slate-800 text-white font-bold text-[10px]">1. Pattern</span> The spatial distribution of housing affordability exhibits a clear centrifugal pattern, where property costs decrease progressively moving outwards from the central business district.</p>
+                        <p class="mt-2"><span class="p-1 rounded bg-emerald-600 text-white font-bold text-[10px]">4. Evidence</span> Cross-referencing our primary survey data with census records shows the Inner City meshblock has a median weekly rent of $850, while the Outer Suburb meshblock median drops to $450.</p>
+                        <p class="mt-2"><span class="p-1 rounded bg-indigo-600 text-white font-bold text-[10px]">5. Explanation</span> Why does this occur? This aligns with bid-rent theory. Land value is highest at the centre due to intense commercial competition for accessible space, pushing lower-income residential communities out to the periphery where land is cheaper.</p>
+                        <p class="mt-2"><span class="p-1 rounded bg-blue-600 text-white font-bold text-[10px]">2. Concept</span> This highlights the concept of socio-economic <strong>Processes</strong>. Gentrification and market economics continuously reshape the city, driving spatial segregation.</p>
+                        <p class="l3-only mt-2"><span class="p-1 rounded bg-amber-500 text-white font-bold text-[10px]">3. Anomaly</span> <strong>Level 3 Anomaly:</strong> An anomaly occurs in Meshblock C (Coastal Fringe), where despite being 25km from the CBD, median rent spikes to $900. This localised anomaly is caused by high-amenity natural landscapes (ocean views), which override standard commute-based pricing models.</p>
+                    `;
+                    if (plainTextTarget) plainTextTarget.textContent = "The spatial distribution of housing affordability exhibits a clear centrifugal pattern, where property costs decrease progressively moving outwards from the central business district. Cross-referencing our primary survey data with census records shows the Inner City meshblock has a median weekly rent of $850, while the Outer Suburb meshblock median drops to $450. Why does this occur? This aligns with bid-rent theory. Land value is highest at the centre due to intense commercial competition for accessible space, pushing lower-income residential communities out to the periphery where land is cheaper. This highlights the concept of socio-economic Processes. Gentrification and market economics continuously reshape the city, driving spatial segregation. An anomaly occurs in Meshblock C (Coastal Fringe), where despite being 25km from the CBD, median rent spikes to $900. This localised anomaly is caused by high-amenity natural landscapes (ocean views), which override standard commute-based pricing models.";
+                }
+            }
+            else if (stage === 'conclusion') {
+                if (chosen === 'hazard') target.innerText = `"In conclusion, the inquiry successfully resolved the research aim by identifying a clear correlation between residential proximity to the coast and community hazard preparedness. The overriding spatial pattern proves that proactive safety behaviour is clustered in high-risk zones. Specifically, Coastal Zone A tracked a high preparedness mean of 4.5/5, contrasting sharply with the 2.1/5 score logged across the inland Zone B, confirming our initial thesis."`;
+                if (chosen === 'transport') target.innerText = `"In conclusion, the transport perception tracking aims were achieved. The overriding spatial trend shows a continuous drop in public transit satisfaction corresponding to suburban distance from the central hub. Specifically, Station 1 recorded a mean satisfaction score of 4.2/5 with high frequency service, while Station 5 (12km out) dropped to 1.8/5, verifying traditional infrastructure centralisation theories."`;
+                if (chosen === 'housing') target.innerText = `"In conclusion, our tracking arrays resolved the structural aim to determine housing affordability variability across the urban system. The overriding trend proves that proximity to the CBD dictates pricing pressure. As documented in our processed graphs, inner-city meshblocks recorded severe unaffordability indices ($850/wk), whereas the peripheral zones offered accessible housing ($450/wk), confirming economic models dictate urban social structures."`;
+            }
+            else if (stage === 'evaluation') {
+                if (chosen === 'sample') {
+                    target.innerHTML = `"A major weakness in our methodology was relying on convenience sampling outside a local supermarket at 10:00 AM. By surveying mid-morning shoppers, we entirely missed the active working demographic, leading to a sample made up of 68% retired residents.<br><br>This directly compromises the overall <span class="bg-amber-100 font-bold px-1 rounded text-amber-900 font-mono">internal validity</span> of our conclusion. Our findings do not give a true and representative view of the issue because they overrepresent a specific demographic's views and cannot be reliably applied to the wider city population.<br><br><span class="l2-only">This research could be improved next time by spreading data collection across morning, midday, and evening slots to capture a wider demographic and ensure representativeness.</span><span class="l3-only">An <strong>alternative appropriate method</strong> to improve validity would involve executing a stratified random sample, mailing structured digital surveys directly to homes distributed evenly across the target zones. The <strong>implication</strong> is that this approach drastically improves data quality and representativeness (elevating validity). However, the <strong>logistical effect</strong> on the researchers is an increase in planning time and a lower guaranteed response rate compared to face-to-face fieldwork.</span>"`;
+                    if (plainTextTarget) plainTextTarget.textContent = "A major weakness in our methodology was relying on convenience sampling outside a local supermarket at 10:00 AM. By surveying mid-morning shoppers, we entirely missed the active working demographic, leading to a sample made up of 68% retired residents. This directly compromises the overall internal validity of our conclusion. Our findings do not give a true and representative view of the issue because they overrepresent a specific demographic's views and cannot be reliably applied to the wider city population. An alternative appropriate method to improve validity would involve executing a stratified random sample, mailing structured digital surveys directly to homes distributed evenly across the target zones. The implication is that this approach drastically improves data quality and representativeness (elevating validity). However, the logistical effect on the researchers is an increase in planning time and a lower guaranteed response rate compared to face-to-face fieldwork.";
+                } else if (chosen === 'time') {
+                    target.innerHTML = `"A major limitation in our research layout involved gathering primary pedestrian flow tallies during an isolated storm event on a single Tuesday afternoon. The extreme weather suppressed public foot traffic, keeping our logged figures artificially low.<br><br>This directly limits the overall <span class="bg-amber-100 font-bold px-1 rounded text-amber-900 font-mono">validity</span> of our conclusion that Node B is 'underutilised'. While accurate for that specific afternoon, the dataset is temporally biased and our final findings are not a true or reliable representation of the street's baseline use.<br><br><span class="l2-only">This research layout could be improved next time by tracking pedestrian volume across three distinct sessions in varying weather conditions to calculate a true rolling mean.</span><span class="l3-only">An <strong>alternative appropriate method</strong> to improve data validation would involve deploying permanent infrared counts at our key intersections to capture a continuous 14-day tracking block. The <strong>implication</strong> of this alternative strategy is that it removes weather bias and strengthens the accuracy of our conclusions (high validity), although it has an <strong>ethical/logistical implication</strong> regarding public surveillance and requires specialised monitoring instruments.</span>"`;
+                    if (plainTextTarget) plainTextTarget.textContent = "A major limitation in our research layout involved gathering primary pedestrian flow tallies during an isolated storm event on a single Tuesday afternoon. The extreme weather suppressed public foot traffic, keeping our logged figures artificially low. This directly limits the overall validity of our conclusion that Node B is 'underutilised'. While accurate for that specific afternoon, the dataset is temporally biased and our final findings are not a true or reliable representation of the street's baseline use. An alternative appropriate method to improve data validation would involve deploying permanent infrared counts at our key intersections to capture a continuous 14-day tracking block. The implication of this alternative strategy is that it removes weather bias and strengthens the accuracy of our conclusions (high validity), although it has an ethical/logistical implication regarding public surveillance and requires specialised monitoring instruments.";
+                }
+            }
+        }
+
+        // --- Expanded Presentation Rendering Engine ---
+        function renderSpecificChart() {
+            const canvas = document.getElementById('presentationChart');
+            const canvasContainer = document.getElementById('presentation-canvas-wrapper');
+            const tableContainer = document.getElementById('presentation-table-wrapper');
+            
+            if (!canvas || !canvasContainer || !tableContainer) return;
+            
+            const ctx = canvas.getContext('2d');
+            const selection = document.getElementById('graph-type-select').value;
+            
+            const primary = currentLevel === 3 ? '#2563eb' : '#0d9488';
+            const secondary = currentLevel === 3 ? '#93c5fd' : '#99f6e4';
+            const neutralDark = '#1e293b';
+            const accent = '#fbbf24';
+            const lightGrey = '#cbd5e1';
+
+            if (globalChartInstance) globalChartInstance.destroy();
+
+            let config = {};
+            let desc = "";
+
+            if (selection === 'table') {
+                canvasContainer.classList.add('hidden');
+                tableContainer.classList.remove('hidden');
+                desc = "📋 **Data Tables:** While maps and graphs are essential, raw processed data tables are often required to explicitly show your mathematical aggregations (e.g., means, totals, percentages) so moderators can verify your calculations.";
+                document.getElementById('graph-educational-desc').innerHTML = desc;
+                return;
+            } else {
+                canvasContainer.classList.remove('hidden');
+                tableContainer.classList.add('hidden');
+            }
+
+            switch(selection) {
+                case 'bar':
+                    config = {
+                        type: 'bar',
+                        data: {
+                            labels: ['Site 1', 'Site 2', 'Site 3', 'Site 4'],
+                            datasets: [
+                                { label: 'Variable Measure A', data: [120, 85, 190, 40], backgroundColor: primary },
+                                { label: 'Variable Measure B', data: [165, 95, 230, 55], backgroundColor: secondary }
+                            ]
+                        },
+                        options: { 
+                            responsive: true, 
+                            maintainAspectRatio: false,
+                            plugins: { title: { display: true, text: 'Comparative Volume Analysis Across Stations', font: { size: 14 } } },
+                            scales: {
+                                x: { title: { display: true, text: 'Survey Station / Location', font: { weight: 'bold' } } },
+                                y: { title: { display: true, text: 'Recorded Volume (Units)', font: { weight: 'bold' } } }
+                            }
+                        }
+                    };
+                    desc = "📊 **Bar Graphs:** Excellent for comparing discrete, paired quantities across separate geographic locations or stations (e.g., comparing traffic volumes at peak vs. off-peak times across four target intersections).";
+                    break;
+                    
+                case 'line':
+                    config = {
+                        type: 'line',
+                        data: {
+                            labels: ['0m', '20m', '40m', '60m', '80m', '100m'],
+                            datasets: [{
+                                label: 'Topographical Elevation Profile (m)',
+                                data: [14, 15.2, 11.8, 6.4, 3.1, 0.5],
+                                borderColor: primary,
+                                backgroundColor: 'transparent',
+                                borderWidth: 3,
+                                pointBackgroundColor: accent
+                            }]
+                        },
+                        options: { 
+                            responsive: true, 
+                            maintainAspectRatio: false,
+                            plugins: { title: { display: true, text: 'Continuous Gradient Profile', font: { size: 14 } } },
+                            scales: {
+                                x: { title: { display: true, text: 'Distance along Transect (m)', font: { weight: 'bold' } } },
+                                y: { title: { display: true, text: 'Measured Parameter (e.g., Elevation in m)', font: { weight: 'bold' } } }
+                            }
+                        }
+                    };
+                    desc = "📈 **Line Graphs / Profiles:** Ideal for displaying continuous geographical gradients, landscape profiles, or variations over linear distance (e.g., showing a physical beach profile gradient running from high dune points down to the low tide mark).";
+                    break;
+
+                case 'pie':
+                    config = {
+                        type: 'pie',
+                        data: {
+                            labels: ['Commercial Retail', 'Residential Blocks', 'Industrial Infrastructure', 'Public Greenspace'],
+                            datasets: [{
+                                data: [45, 30, 15, 10],
+                                backgroundColor: [primary, secondary, neutralDark, accent]
+                            }]
+                        },
+                        options: { 
+                            responsive: true, 
+                            maintainAspectRatio: false,
+                            plugins: { title: { display: true, text: 'Proportional Land-Use Composition at Site 1', font: { size: 14 } } }
+                        }
+                    };
+                    desc = "🍕 **Pie Graphs:** Best for illustrating proportional composition or percentage breakdowns of a single total variable at **one specific location** (e.g., land-use percentages within a singular downtown grid zone). Do not use these to show shifts across distance.";
+                    break;
+
+                case 'stacked':
+                    config = {
+                        type: 'bar',
+                        data: {
+                            labels: ['Zone A', 'Zone B', 'Zone C'],
+                            datasets: [
+                                { label: 'Category X', data: [60, 30, 10], backgroundColor: primary },
+                                { label: 'Category Y', data: [10, 40, 50], backgroundColor: secondary },
+                                { label: 'Category Z', data: [30, 30, 40], backgroundColor: lightGrey }
+                            ]
+                        },
+                        options: { 
+                            responsive: true, 
+                            maintainAspectRatio: false, 
+                            plugins: { title: { display: true, text: '100% Compositional Breakdown across Zones', font: { size: 14 } } },
+                            scales: { 
+                                x: { stacked: true, title: { display: true, text: 'Study Zones', font: { weight: 'bold' } } }, 
+                                y: { stacked: true, title: { display: true, text: 'Percentage of Total (%)', font: { weight: 'bold', max: 100 } } } 
+                            } 
+                        }
+                    };
+                    desc = "📊 **Percentage Bar Graphs (100% Stacked):** The ultimate tool for comparative composition. Use these when you want to contrast how percentage distributions change between **multiple distinct locations** (e.g., contrasting the percentage of land-use types across three varying neighbourhoods).";
+                    break;
+
+                case 'scatter':
+                    config = {
+                        type: 'scatter',
+                        data: {
+                            datasets: [{
+                                label: 'Bivariate Field Correlation Axis',
+                                data: [
+                                    {x: 1.5, y: 70}, {x: 1.2, y: 55}, {x: 0.8, y: 35}, 
+                                    {x: 0.4, y: 12}, {x: 1.6, y: 78}, {x: 0.7, y: 40}
+                                ],
+                                backgroundColor: '#ef4444',
+                                radius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true, 
+                            maintainAspectRatio: false,
+                            plugins: { title: { display: true, text: 'Bivariate Correlation Analysis', font: { size: 14 } } },
+                            scales: { 
+                                x: { type: 'linear', position: 'bottom', title: { display: true, text: 'Independent Variable (e.g., Velocity m/s)', font: { weight: 'bold' } } },
+                                y: { title: { display: true, text: 'Dependent Variable (e.g., Sediment Size mm)', font: { weight: 'bold' } } }
+                            }
+                        }
+                    };
+                    desc = "📉 **Scatter Plots:** Tailored for checking relationships between two continuous variables (bivariate correlation). Vital for verifying geographic distance-decay rules (e.g., plotting river velocity along the X-axis against bedload particle diameter along the Y-axis).";
+                    break;
+            }
+
+            globalChartInstance = new Chart(ctx, config);
+            document.getElementById('graph-educational-desc').innerHTML = desc;
+        }
+
+        // --- Expanded Map Representation Controller ---
+        function updateMapDisplay() {
+            const selectValue = document.getElementById('map-type-select').value;
+            drawCanvasMap(selectValue);
+            
+            let desc = "";
+            switch(selectValue) {
+                case 'choropleth':
+                    desc = "🗺️ **Statistical Map (Choropleth):** Areas or spatial boundary polygons (like census meshblocks or sampling zones) are shaded in proportion to a statistical variable. **Best Data Match:** Density metrics, environmental index scores (EQI), or median household income datasets.";
+                    break;
+                case 'proportional':
+                    desc = "🔴 **Proportional Symbol Maps:** Draw a uniform marker (usually a circle) directly over specific point locations. The area of the symbol scales up matching data values. **Best Data Match:** Absolute volumes at exact points, such as traffic volume counts at localised intersections.";
+                    break;
+                case 'flow':
+                    desc = "🏹 **Flow Line Maps:** Use linear arrows to connect origins and destinations across a geographical grid. The thickness of the arrow line represents the volume of movement. **Best Data Match:** Spatial traffic dynamics, longshore drift pathways, or commuter patterns.";
+                    break;
+                case 'isoline':
+                    desc = "〰️ **Isoline (Contour) Maps:** Connect data points that share completely equal continuous values across a matrix map layout. **Best Data Match:** Continuous physical values that morph across environments, such as noise level distributions, microclimate temperatures, or terrain heights.";
+                    break;
+                case 'heat':
+                    desc = "🔥 **GIS Heat Maps (Kernel Density):** Converts discrete point data into a continuous 'hot' or 'cold' colour gradient based on spatial density. Excellent for showing retail clustering or crime hotspots.";
+                    break;
+                case 'swipe':
+                    desc = "↔️ **GIS Slide/Swipe Map:** An interactive GIS presentation method. Allows users to slide a vertical bar back and forth to directly compare two overlapping datasets (e.g., historical aerial imagery vs. modern land use).";
+                    break;
+                case 'time_distance':
+                    desc = "⏱️ **Time/Distance Maps (Isochrones):** Shows areas of equal travel time or physical distance from a central node via concentric irregular rings. Excellent for showing accessibility to services like retail nodes or public transport hubs.";
+                    break;
+            }
+            document.getElementById('map-educational-desc').innerHTML = desc;
+        }
+
+        function drawCanvasMap(mode) {
+            const canvas = document.getElementById('geoCanvasMap');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, 500, 250);
+            ctx.fillStyle = "#f8fafc"; ctx.fillRect(0, 0, 500, 250);
+            
+            // Draw baseline land mass profile outline
+            ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 2; ctx.beginPath();
+            ctx.moveTo(30, 40); ctx.quadraticCurveTo(150, 10, 250, 60);
+            ctx.quadraticCurveTo(380, 20, 470, 70); ctx.lineTo(450, 210);
+            ctx.quadraticCurveTo(250, 240, 50, 200); ctx.closePath(); ctx.stroke();
+
+            const levelColorDark = currentLevel === 3 ? '#1e40af' : '#134e4a';
+            const levelColorMid = currentLevel === 3 ? '#93c5fd' : '#99f6e4';
+            const levelColorLight = currentLevel === 3 ? '#eff6ff' : '#f0fdfa';
+
+            if (mode === 'choropleth') {
+                ctx.fillStyle = levelColorLight; ctx.fillRect(50, 50, 120, 120);
+                ctx.fillStyle = levelColorMid; ctx.fillRect(170, 50, 140, 120);
+                ctx.fillStyle = levelColorDark; ctx.fillRect(310, 50, 130, 120);
+                ctx.fillStyle = "#000000"; ctx.font = "bold 9px monospace";
+                ctx.fillText("Zone C (Low)", 60, 115); ctx.fillText("Zone B (Mid)", 180, 115);
+                ctx.fillStyle = "#ffffff"; ctx.fillText("Zone A (High)", 320, 115);
+            } 
+            else if (mode === 'proportional') {
+                const circles = [{x: 110, y: 120, r: 10, v: "8"}, {x: 240, y: 100, r: 24, v: "42"}, {x: 370, y: 130, r: 42, v: "115"}];
+                circles.forEach(c => {
+                    ctx.fillStyle = "rgba(239, 68, 68, 0.8)"; ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.arc(c.x, c.y, c.r, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = "#ffffff"; ctx.font = "bold 10px sans-serif"; ctx.textAlign = "center";
+                    ctx.fillText(c.v, c.x, c.y + 4);
+                });
+            } 
+            else if (mode === 'flow') {
+                ctx.strokeStyle = currentLevel === 3 ? '#2563eb' : '#0d9488'; ctx.lineCap = "round";
+                ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(80, 100); ctx.lineTo(220, 100); ctx.stroke();
+                ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(80, 130); ctx.lineTo(300, 130); ctx.stroke();
+                ctx.lineWidth = 14; ctx.beginPath(); ctx.moveTo(80, 170); ctx.lineTo(410, 170); ctx.stroke();
+                ctx.fillStyle = "#0f172a"; ctx.font = "10px monospace"; ctx.textAlign = "left";
+                ctx.fillText("Vector 1 (Low)", 90, 92); ctx.fillText("Vector 2 (Mid)", 90, 122);
+                ctx.fillText("Vector 3 (Max)", 90, 158);
+            }
+            else if (mode === 'isoline') {
+                ctx.strokeStyle = currentLevel === 3 ? '#1e40af' : '#0f766e'; ctx.lineWidth = 2;
+                ctx.font = "8px sans-serif"; ctx.fillStyle = ctx.strokeStyle;
+                
+                ctx.beginPath(); ctx.arc(250, 120, 90, 0, 2 * Math.PI); ctx.stroke(); ctx.fillText("60 Unit", 250, 34);
+                ctx.beginPath(); ctx.arc(250, 120, 60, 0, 2 * Math.PI); ctx.stroke(); ctx.fillText("70 Unit", 250, 64);
+                ctx.beginPath(); ctx.arc(250, 120, 35, 0, 2 * Math.PI); ctx.stroke(); ctx.fillText("80 Unit", 250, 89);
+            }
+            else if (mode === 'heat') {
+                const g1 = ctx.createRadialGradient(180, 120, 0, 180, 120, 60);
+                g1.addColorStop(0, "rgba(239, 68, 68, 0.9)"); 
+                g1.addColorStop(0.5, "rgba(250, 204, 21, 0.5)"); 
+                g1.addColorStop(1, "rgba(255, 255, 255, 0)"); 
+                ctx.fillStyle = g1; ctx.fillRect(0,0,500,250);
+
+                const g2 = ctx.createRadialGradient(340, 140, 0, 340, 140, 90);
+                g2.addColorStop(0, "rgba(239, 68, 68, 0.9)");
+                g2.addColorStop(0.5, "rgba(250, 204, 21, 0.5)");
+                g2.addColorStop(1, "rgba(255, 255, 255, 0)");
+                ctx.fillStyle = g2; ctx.fillRect(0,0,500,250);
+            }
+            else if (mode === 'swipe') {
+                ctx.fillStyle = "#e2e8f0"; ctx.fillRect(50, 50, 200, 150);
+                ctx.fillStyle = "rgba(239, 68, 68, 0.5)"; ctx.fillRect(250, 50, 200, 150);
+                ctx.strokeStyle = "#1e293b"; ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.moveTo(250, 40); ctx.lineTo(250, 210); ctx.stroke();
+                ctx.fillStyle = "#ffffff"; ctx.beginPath(); ctx.arc(250, 125, 14, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = "#1e293b"; ctx.font = "12px sans-serif"; ctx.textAlign = "center"; ctx.fillText("<>", 250, 129);
+                ctx.fillStyle = "#000"; ctx.font = "10px monospace";
+                ctx.fillText("1990 Aerial", 150, 125); ctx.fillText("2024 Land Use", 350, 125);
+            }
+            else if (mode === 'time_distance') {
+                ctx.strokeStyle = currentLevel === 3 ? '#2563eb' : '#0d9488';
+                ctx.fillStyle = currentLevel === 3 ? "rgba(37, 99, 235, 0.1)" : "rgba(13, 148, 136, 0.1)";
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(250, 120, 100, 0, Math.PI*2); ctx.fill(); ctx.stroke(); // 15 min
+                ctx.beginPath(); ctx.arc(250, 120, 60, 0, Math.PI*2); ctx.fill(); ctx.stroke(); // 10 min
+                ctx.beginPath(); ctx.arc(250, 120, 25, 0, Math.PI*2); ctx.fill(); ctx.stroke(); // 5 min
+                ctx.fillStyle = "#ef4444"; ctx.beginPath(); ctx.arc(250, 120, 5, 0, Math.PI*2); ctx.fill(); // Node
+                ctx.fillStyle = "#1e293b"; ctx.font = "10px sans-serif"; ctx.textAlign = "center";
+                ctx.fillText("5m Isochrone", 250, 90); ctx.fillText("10m Isochrone", 250, 55); ctx.fillText("15m Isochrone", 250, 15);
+            }
+            
+            // Map Orientation Standard Additions
+            if(mode !== 'swipe') {
+                ctx.fillStyle = "#1e293b"; ctx.font = "10px sans-serif"; ctx.textAlign = "right";
+                ctx.fillText("N  ↑", 480, 30); ctx.fillRect(430, 220, 50, 4); ctx.fillText("100m", 425, 224);
+            }
+        }
+
+        // --- Visual Evidence Presentation Engine ---
+        function updateVisualDisplay() {
+            const val = document.getElementById('visual-type-select').value;
+            const descEl = document.getElementById('visual-educational-desc');
+            const displayEl = document.getElementById('visual-display-area');
+
+            let desc = "";
+            let html = "";
+
+            if (val === 'photo') {
+                desc = "📸 **Annotated Photos:** Do not just insert blank photos. Add directional arrows, callout boxes, and text directly onto the image to highlight the specific geographic features you are analysing in your text.";
+                html = `<div class="relative w-full h-48 bg-sky-200 border rounded flex items-center justify-center overflow-hidden shadow-inner"><span class="text-sky-600 font-bold opacity-50 text-xl">Landscape Photo</span><div class="absolute border-[4px] border-red-500 w-16 h-16 rounded-full top-8 left-1/4 shadow-lg"></div><div class="absolute bg-white border border-red-500 text-red-600 text-[10px] font-bold px-2 py-1 top-10 left-1/3 shadow-md rounded">Active Erosion Scarp</div><div class="absolute h-1 w-12 bg-red-500 top-[52px] left-[29%]"></div></div>`;
+            } else if (val === 'sketch') {
+                desc = "✏️ **Field Sketches:** Hand-drawn representations of your site. These filter out unnecessary background noise and focus the viewer entirely on the key geographic elements (e.g., drawing just the river channel and banks, ignoring distant mountains).";
+                html = `<div class="relative w-full h-48 bg-orange-50 border border-slate-300 rounded flex items-center justify-center shadow-inner" style="background-image: repeating-linear-gradient(transparent, transparent 19px, #e2e8f0 19px, #e2e8f0 20px);"><svg viewBox="0 0 100 50" class="w-full h-full opacity-60"><path d="M10,40 Q30,20 50,40 T90,30" fill="none" stroke="#475569" stroke-width="2"/><text x="45" y="48" font-size="6" fill="#475569">River Channel Profile</text></svg></div>`;
+            } else if (val === 'diagram') {
+                desc = "📐 **Diagrams:** Abstract visual models explaining how a geographic process works. Excellent for visually defining complex cycles (e.g., a cross-section diagram showing exactly how longshore drift moves sediment along the coast).";
+                html = `<div class="relative w-full h-48 bg-slate-50 border rounded flex flex-col items-center justify-center shadow-inner gap-2"><div class="flex gap-4 items-center"><div class="w-16 h-16 bg-blue-200 rounded-full flex items-center justify-center text-[10px] font-bold text-blue-800 text-center leading-tight border border-blue-300 p-2">Swash<br>Action</div><span class="text-xl">➡️</span><div class="w-16 h-16 bg-emerald-200 rounded flex items-center justify-center text-[10px] font-bold text-emerald-800 text-center leading-tight border border-emerald-300 p-2">Sediment<br>Transport</div></div><span class="text-xs font-bold text-slate-500 mt-2">Conceptual Process Model</span></div>`;
+            }
+
+            descEl.innerHTML = desc;
+            displayEl.innerHTML = html;
+        }
+
+        // --- Utility Functions ---
+        function toggleChat() {
+            const p = document.getElementById('chat-panel');
+            const f = document.getElementById('chat-fab');
+            p.classList.toggle('show');
+            f.classList.toggle('open');
+            if (p.classList.contains('show')) document.getElementById('input-global').focus();
+        }
+
+        function submitChat() {
+            const i = document.getElementById('input-global');
+            const txt = i.value.trim(); if(!txt) return;
+            const b = document.getElementById('chat-global');
+            const u = document.createElement('div'); u.className = 'msg-user pop-alert'; u.innerText = txt; b.appendChild(u);
+            i.value = ''; b.scrollTop = b.scrollHeight;
+            setTimeout(() => {
+                const m = document.createElement('div'); m.className = 'msg-mentor pop-alert';
+                m.innerHTML = "To view formatting guidance or get custom layout cross-checks, click the <strong>'Review ✨'</strong> buttons inside the relevant workbook tabs.";
+                b.appendChild(m); b.scrollTop = b.scrollHeight;
+            }, 600);
+        }
+
+        // The streamlined, one-click feedback engine
+        function requestFeedback(stage) {
+            const ta = document.getElementById(`draft-${stage}`);
+            if(!ta || ta.value.trim().length < 25) {
+                showNotification("Draft text too short for analysis.", "error");
+                return;
+            }
+            
+            const wrapper = `Act as an expert NZQA Geography Moderator. Evaluate my draft text for the ${stage.toUpperCase()} section of my Level ${currentLevel} project. Check if I have hit all necessary marking criteria. Locked topic: ${currentTopic}. Draft: "${ta.value.trim()}"`;
+            
+            // Clipboard Injector
+            const temp = document.createElement("textarea"); 
+            temp.value = wrapper; 
+            document.body.appendChild(temp); 
+            temp.select();
+            try {
+                document.execCommand('copy');
+                showNotification("Prompt copied! Launching Geo Mentor Gem...", "success");
+            } catch (err) {
+                console.error("Clipboard blocked.");
+            }
+            document.body.removeChild(temp);
+            
+            // Instant redirect to the specified Gem link in a new tab
+            setTimeout(() => {
+                window.open("https://gemini.google.com/gem/11738WiEIHEDsZEwRhKsGxqOIZXRXgJAN?usp=sharing", "_blank");
+            }, 800);
+        }
+
+        function copyText(id, btn) {
+            const el = document.getElementById(id); 
+            if(!el) return;
+            
+            const textToCopy = (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') ? el.value : el.textContent;
+            const tempTa = document.createElement("textarea");
+            tempTa.value = textToCopy;
+            document.body.appendChild(tempTa);
+            tempTa.select();
+            
+            try {
+                document.execCommand('copy');
+                const orig = btn.innerHTML; 
+                btn.innerHTML = "✅ Copied";
+                showNotification("Content copied to clipboard.", "success");
+                setTimeout(() => btn.innerHTML = orig, 1500);
+            } catch (err) {
+                showNotification("Clipboard action denied by browser.", "error");
+            }
+            document.body.removeChild(tempTa);
+        }
+
+        function exportDrafts() {
+            const steps = ['plan', 'analysis', 'conclusion', 'evaluation'];
+            let out = `NCEA Level ${currentLevel} Research Portfolio Draft\nAim Context: ${currentTopic}\n\n`;
+            steps.forEach(s => { 
+                out += `--- Section: ${s.toUpperCase()} ---\n${document.getElementById('draft-'+s)?.value || '[Empty field]'}\n\n`; 
+            });
+            document.getElementById('export-text').value = out;
+            document.getElementById('export-overlay').classList.add('show');
+        }
+
+        function closeExportModal() { 
+            document.getElementById('export-overlay').classList.remove('show'); 
+        }
+
+        function copyExportText(btn) {
+            const tx = document.getElementById('export-text'); 
+            tx.select(); 
+            document.execCommand('copy');
+            const orig = btn.innerHTML; 
+            btn.innerHTML = "✅ Saved Portfolio"; 
+            showNotification("Portfolio copied to clipboard.", "success");
+            setTimeout(() => btn.innerHTML = orig, 2000);
+        }
+
+        window.onload = () => {
+            init();
+        };
+    </script>
+</body>
+</html>
