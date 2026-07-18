@@ -96,7 +96,7 @@
         .progress-fill { height: 100%; background: var(--whs-dark); width: 0%; transition: width 0.5s ease-out; }
 
         /* Quill Editor Overrides */
-        .ql-toolbar.ql-snow { border: 1px solid #1e293b !important; background: #f8fafc; font-family: 'Manrope', sans-serif; border-radius: 0.75rem 0.75rem 0 0; }
+        .ql-toolbar.ql-snow { border: 1px solid #1e293b !important; background: #f8fafc; font-family: 'Manrope', sans-serif; border-radius: 0 0 0 0; }
         .ql-container.ql-snow { border: 1px solid #cbd5e1 !important; border-top: none !important; border-radius: 0 0 0.75rem 0.75rem; background: white; font-family: 'Manrope', sans-serif; font-size: 0.95rem; height: 380px; box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.03); }
         .ql-editor { padding: 1.5rem; line-height: 1.7; color: #334155; }
 
@@ -144,10 +144,6 @@
         body.locked-mode .nav-btn:not(#nav-aim) { opacity: 0.5; pointer-events: none; filter: grayscale(100%); }
         body.locked-mode .content-requires-lock { display: none !important; }
         body:not(.locked-mode) .requires-lock-warning { display: none !important; }
-        
-        /* Direct Insert Starter Buttons */
-        .insert-starter-btn { cursor: pointer; transition: all 0.2s ease; }
-        .insert-starter-btn:hover { transform: translateX(2px); }
     </style>
 </head>
 <body data-level="3" class="locked-mode bg-theme-aim pb-10">
@@ -185,8 +181,8 @@
         </header>
 
         <!-- DYNAMIC NAVIGATION (Boxed Pills) -->
-        <div class="mb-8 flex flex-col items-center">
-            <nav class="flex items-center justify-center flex-wrap gap-3 overflow-x-auto custom-scrollbar pb-2" id="main-nav">
+        <div class="mb-8">
+            <nav class="flex items-center justify-center gap-3 overflow-x-auto custom-scrollbar pb-2" id="main-nav">
                 <button type="button" class="nav-btn tab-aim active" id="nav-aim" onclick="switchView('aim')"><i data-lucide="target" class="w-4 h-4"></i> 1. Aim</button>
                 <button type="button" class="nav-btn tab-plan" id="nav-plan" onclick="switchView('plan')"><i data-lucide="circle" class="w-4 h-4 transition-colors" id="icon-plan"></i> 2. Plan</button>
                 <button type="button" class="nav-btn tab-data" id="nav-data" onclick="switchView('data')"><i data-lucide="circle" class="w-4 h-4 transition-colors" id="icon-data"></i> 3. Data</button>
@@ -200,18 +196,18 @@
                 <button type="button" class="nav-btn tab-evaluation" id="nav-evaluation" onclick="switchView('evaluation')"><i data-lucide="circle" class="w-4 h-4 transition-colors" id="icon-evaluation"></i> 7. Evaluation <span class="excellence-badge text-[10px] px-1 py-0.5 rounded-sm ml-1">E</span></button>
                 <button type="button" class="nav-btn tab-final" id="nav-final" onclick="switchView('final')"><i data-lucide="layers" class="w-4 h-4"></i> 8. Final</button>
             </nav>
-            <div class="progress-container max-w-5xl w-full">
+            <div class="progress-container">
                 <div class="progress-fill" id="overall-progress"></div>
             </div>
         </div>
 
-        <main class="min-h-[60vh] flex flex-col items-center w-full">
+        <main class="min-h-[60vh]">
             
             <!-- ================= VIEW 1: AIM ================= -->
-            <div id="view-aim" class="view-section space-y-8 animate-in fade-in duration-500 w-full max-w-5xl">
+            <div id="view-aim" class="view-section space-y-8 animate-in fade-in duration-500 max-w-4xl mx-auto">
                 
                 <!-- Dynamic Task Box -->
-                <div class="bg-white border-l-4 border-blue-500 p-6 rounded-r-xl shadow-sm mb-8 max-w-4xl mx-auto w-full">
+                <div class="bg-white border-l-4 border-blue-500 p-6 rounded-r-xl shadow-sm mb-8">
                     <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2"><i data-lucide="clipboard-list" class="w-5 h-5 text-blue-500"></i> Task Requirements: Aim</h3>
                     <ul class="text-sm text-slate-700 space-y-1 list-disc list-inside">
                         <li>State the focus of your research.</li>
@@ -220,12 +216,12 @@
                     </ul>
                 </div>
 
-                <div class="text-center mb-8 max-w-4xl mx-auto w-full">
+                <div class="text-center mb-8">
                     <h2 class="text-3xl font-serif font-bold text-slate-900 mb-4">Establishing Your Research Aim</h2>
                     <p class="text-lg text-slate-600">Geographic research requires an investigative process related to a particular area.</p>
                 </div>
 
-                <div id="aim-input-container" class="glass-card mb-8 border-t-4 border-blue-500 shadow-md bg-white max-w-4xl mx-auto w-full">
+                <div id="aim-input-container" class="glass-card mb-8 border-t-4 border-blue-500 shadow-md bg-white">
                     <label class="text-sm font-bold text-slate-500 uppercase tracking-widest block mb-4">Draft Your Inquiry:</label>
                     <div class="flex flex-col gap-4">
                         <input type="text" id="draft-topic" placeholder="e.g. To analyse the spatial distribution of..." class="w-full p-4 rounded-xl border border-slate-300 font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 text-lg transition-colors">
@@ -245,7 +241,7 @@
                 </div>
 
                 <!-- LOCKED DISPLAY -->
-                <div id="locked-aim-display" class="hidden glass-card bg-emerald-50 border-emerald-200 mb-8 relative overflow-hidden max-w-4xl mx-auto w-full">
+                <div id="locked-aim-display" class="hidden glass-card bg-emerald-50 border-emerald-200 mb-8 relative overflow-hidden">
                     <div class="relative z-10">
                         <h3 class="text-sm font-bold text-emerald-800 uppercase tracking-widest mb-3 flex items-center gap-2">✅ Locked Research Aim</h3>
                         <p class="text-xl font-serif font-bold text-emerald-900 bg-white p-4 rounded-lg border border-emerald-200 shadow-sm" id="locked-topic-text"></p>
@@ -256,7 +252,7 @@
                     </div>
                 </div>
 
-                <div class="glass-card p-6 md:p-8 max-w-4xl mx-auto w-full">
+                <div class="glass-card p-6 md:p-8">
                     <h3 class="text-xl font-serif font-bold text-slate-900 mb-5">Excellence Aim Checklist</h3>
                     <ul class="space-y-4 text-base text-slate-700">
                         <li class="flex items-start gap-4">
@@ -276,9 +272,9 @@
             </div>
 
             <!-- ================= VIEW 2: PLAN ================= -->
-            <div id="view-plan" class="view-section hidden space-y-8 animate-in fade-in duration-500 w-full max-w-5xl">
+            <div id="view-plan" class="view-section hidden space-y-8 animate-in fade-in duration-500 max-w-5xl mx-auto">
                 
-                <div class="bg-white border-l-4 border-emerald-500 p-6 rounded-r-xl shadow-sm mb-6 w-full">
+                <div class="bg-white border-l-4 border-emerald-500 p-6 rounded-r-xl shadow-sm mb-6">
                     <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2"><i data-lucide="clipboard-list" class="w-5 h-5 text-emerald-500"></i> Task Requirements: Methodology</h3>
                     <ul class="text-sm text-slate-700 space-y-1 list-disc list-inside">
                         <li>What data will you collect?</li>
@@ -288,13 +284,13 @@
                     </ul>
                 </div>
 
-                <div class="requires-lock-warning bg-amber-50 border border-amber-200 p-10 rounded-2xl text-center shadow-sm max-w-2xl mx-auto w-full">
+                <div class="requires-lock-warning bg-amber-50 border border-amber-200 p-10 rounded-2xl text-center shadow-sm max-w-2xl mx-auto">
                     <i data-lucide="lock" class="w-16 h-16 mx-auto mb-4 text-amber-500"></i>
                     <h3 class="font-bold text-amber-900 text-2xl mb-2">Topic Not Locked</h3>
                     <p class="text-amber-800 text-base">Please navigate back to the <strong>Aim</strong> tab and establish a valid layout to unlock tailored planning advice.</p>
                 </div>
 
-                <div class="grid lg:grid-cols-12 gap-8 content-requires-lock w-full">
+                <div class="grid lg:grid-cols-12 gap-8 content-requires-lock">
                     <div class="lg:col-span-6 xl:col-span-7 space-y-6">
                         <div>
                             <h2 class="text-3xl font-serif font-bold text-slate-900 mb-2">Methodology Planning</h2>
@@ -343,7 +339,7 @@
 
                     <!-- Right Column Editor Space -->
                     <div class="lg:col-span-6 xl:col-span-5">
-                        <div class="sticky top-24 flex flex-col shadow-lg rounded-xl mb-12 w-full max-w-full">
+                        <div class="sticky top-24 flex flex-col shadow-lg rounded-xl mb-12">
                             <div class="bg-emerald-600 text-white border border-emerald-700 rounded-t-xl p-4 flex justify-between items-center shadow-sm">
                                 <span class="font-bold text-sm flex items-center gap-2"><i data-lucide="edit-3" class="w-4 h-4 text-white"></i> Draft Methodology</span>
                             </div>
@@ -357,9 +353,9 @@
             </div>
 
             <!-- ================= VIEW 3: DATA COLLECTION ================= -->
-            <div id="view-data" class="view-section hidden space-y-8 animate-in fade-in duration-500 w-full max-w-5xl">
+            <div id="view-data" class="view-section hidden space-y-8 animate-in fade-in duration-500 max-w-5xl mx-auto">
                 
-                <div class="bg-white border-l-4 border-purple-500 p-6 rounded-r-xl shadow-sm mb-6 w-full">
+                <div class="bg-white border-l-4 border-purple-500 p-6 rounded-r-xl shadow-sm mb-6">
                     <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2"><i data-lucide="clipboard-list" class="w-5 h-5 text-purple-500"></i> Task Requirements: Data</h3>
                     <ul class="text-sm text-slate-700 space-y-1 list-disc list-inside">
                         <li>Collect and record data relevant to the aim.</li>
@@ -368,18 +364,18 @@
                     </ul>
                 </div>
 
-                <div class="text-center max-w-3xl mx-auto mb-8 w-full">
+                <div class="text-center max-w-3xl mx-auto mb-8">
                     <h2 class="text-3xl font-serif font-black text-slate-900 mb-4">Fieldwork Data Structuring</h2>
                     <p class="text-lg text-slate-600">Excellence workflows require structured, balanced recording mechanisms.</p>
                 </div>
 
-                <div class="requires-lock-warning bg-amber-50 border border-amber-200 p-10 rounded-2xl text-center shadow-sm max-w-2xl mx-auto w-full">
+                <div class="requires-lock-warning bg-amber-50 border border-amber-200 p-10 rounded-2xl text-center shadow-sm max-w-2xl mx-auto">
                     <i data-lucide="lock" class="w-16 h-16 mx-auto mb-4 text-amber-500"></i>
                     <h3 class="font-bold text-amber-900 text-2xl mb-2">Topic Not Locked</h3>
                     <p class="text-amber-800 text-base">Please lock in your initial research inquiry parameters to access raw matrix tools.</p>
                 </div>
 
-                <div class="grid lg:grid-cols-12 gap-8 content-requires-lock w-full">
+                <div class="grid lg:grid-cols-12 gap-8 content-requires-lock">
                     <div class="lg:col-span-6 xl:col-span-7 space-y-6">
 
                         <div class="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-xl shadow-sm border-t border-r border-b border-slate-200">
@@ -432,7 +428,7 @@
                         </div>
                     </div>
 
-                    <div class="lg:col-span-6 xl:col-span-5 content-requires-lock w-full max-w-full">
+                    <div class="lg:col-span-6 xl:col-span-5 content-requires-lock">
                         <div class="sticky top-24 flex flex-col shadow-lg rounded-xl mb-12">
                             <div class="bg-purple-600 text-white border border-purple-700 rounded-t-xl p-4 flex justify-between items-center shadow-sm">
                                 <span class="font-bold text-sm flex items-center gap-2"><i data-lucide="table" class="w-4 h-4 text-white"></i> Draft Collection Log</span>
@@ -444,9 +440,9 @@
             </div>
 
             <!-- ================= VIEW 4: PRESENTATION ================= -->
-            <div id="view-presentation" class="view-section hidden space-y-8 animate-in fade-in duration-500 w-full max-w-5xl">
+            <div id="view-presentation" class="view-section hidden space-y-8 animate-in fade-in duration-500">
                 
-                <div class="bg-white border-l-4 border-amber-500 p-6 rounded-r-xl shadow-sm mb-6 w-full">
+                <div class="bg-white border-l-4 border-amber-500 p-6 rounded-r-xl shadow-sm mb-6 max-w-5xl mx-auto">
                     <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2"><i data-lucide="clipboard-list" class="w-5 h-5 text-amber-500"></i> Task Requirements: Presentation</h3>
                     <ul class="text-sm text-slate-700 space-y-1 list-disc list-inside">
                         <li>Present a combination of spatial (maps) and statistical/visual data.</li>
@@ -456,21 +452,32 @@
                     </ul>
                 </div>
 
-                <div class="text-center max-w-3xl mx-auto mb-8 w-full">
+                <div class="text-center max-w-3xl mx-auto mb-8">
                     <h2 class="text-3xl font-serif font-bold text-slate-900 mb-2">Data Processing & Cartography</h2>
                     <p class="text-lg text-slate-600 mb-6">Select visualisation styles that correctly match and process your geographic datasets.</p>
                 </div>
 
-                <div class="requires-lock-warning text-center py-20 bg-amber-50 rounded-2xl border border-amber-200 max-w-xl mx-auto shadow-sm w-full">
+                <div class="requires-lock-warning text-center py-20 bg-amber-50 rounded-2xl border border-amber-200 max-w-xl mx-auto shadow-sm">
                     <i data-lucide="lock" class="w-16 h-16 mx-auto mb-4 text-amber-500"></i>
                     <h3 class="font-bold text-amber-900 text-2xl mb-2">Topic Not Locked</h3>
                     <p class="text-amber-800 text-base">Please lock your research aim first to generate interactive chart modules.</p>
                 </div>
 
-                <div class="grid lg:grid-cols-12 gap-8 content-requires-lock w-full">
+                <div class="grid lg:grid-cols-12 gap-8 content-requires-lock max-w-6xl mx-auto">
                     <div class="lg:col-span-8 space-y-6">
                         
-                        <div class="flex gap-2 bg-white p-1.5 rounded-lg border shadow-sm overflow-x-auto w-full">
+                        <!-- FEATURE 2: Data Processing Checkpoint -->
+                        <div class="glass-card bg-emerald-50 border-t-4 border-emerald-500 mb-2">
+                            <h3 class="font-serif font-bold text-slate-900 mb-3 text-lg flex items-center gap-2"><i data-lucide="calculator" class="w-5 h-5 text-emerald-600"></i> Pre-Flight Data Processing</h3>
+                            <p class="text-xs text-slate-600 mb-3">Excellence requires processed data. Acknowledge these steps before generating graphs:</p>
+                            <div class="space-y-2 text-sm font-medium text-slate-700">
+                                <label class="flex items-start gap-3 bg-white p-2.5 border border-slate-200 rounded-lg shadow-sm cursor-pointer hover:bg-slate-50"><input type="checkbox" class="mt-1 accent-emerald-600 w-4 h-4"> I have calculated the Mean/Average for each site/node.</label>
+                                <label class="flex items-start gap-3 bg-white p-2.5 border border-slate-200 rounded-lg shadow-sm cursor-pointer hover:bg-slate-50"><input type="checkbox" class="mt-1 accent-emerald-600 w-4 h-4"> I have converted raw survey tallies into Percentages (%).</label>
+                                <label class="flex items-start gap-3 bg-white p-2.5 border border-slate-200 rounded-lg shadow-sm cursor-pointer hover:bg-slate-50"><input type="checkbox" class="mt-1 accent-emerald-600 w-4 h-4"> I have cross-referenced two variables (e.g., age vs. perception).</label>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2 bg-white p-1.5 rounded-lg border shadow-sm overflow-x-auto">
                             <button type="button" class="sub-btn sub-btn-pres active flex-1 justify-center font-bold" id="sub-btn-pres-graphs" onclick="switchSubTab('pres', 'graphs')"><i data-lucide="bar-chart" class="w-4 h-4"></i> Graphs</button>
                             <button type="button" class="sub-btn sub-btn-pres flex-1 justify-center font-bold" id="sub-btn-pres-maps" onclick="switchSubTab('pres', 'maps')"><i data-lucide="map" class="w-4 h-4"></i> Maps</button>
                             <button type="button" class="sub-btn sub-btn-pres flex-1 justify-center font-bold" id="sub-btn-pres-visuals" onclick="switchSubTab('pres', 'visuals')"><i data-lucide="image" class="w-4 h-4"></i> Visuals</button>
@@ -567,9 +574,9 @@
             </div>
 
             <!-- ================= VIEW 5: ANALYSIS ================= -->
-            <div id="view-analysis" class="view-section hidden space-y-8 animate-in fade-in duration-500 w-full max-w-5xl">
+            <div id="view-analysis" class="view-section hidden space-y-8 animate-in fade-in duration-500">
                 
-                <div class="bg-white border-l-4 border-sky-500 p-6 rounded-r-xl shadow-sm mb-6 w-full">
+                <div class="bg-white border-l-4 border-sky-500 p-6 rounded-r-xl shadow-sm mb-6">
                     <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2"><i data-lucide="clipboard-list" class="w-5 h-5 text-sky-500"></i> Task Requirements: <span class="l2-only">Findings</span><span class="l3-only">Analysis</span></h3>
                     <ul class="text-sm text-slate-700 space-y-1 list-disc list-inside">
                         <li class="l2-only">Fully explain the findings of your research by relating them to your aim.</li>
@@ -579,7 +586,7 @@
                     </ul>
                 </div>
 
-                <div class="text-center max-w-3xl mx-auto mb-8 w-full">
+                <div class="text-center max-w-3xl mx-auto mb-8">
                     <h2 class="text-3xl font-serif font-black text-slate-900 mb-4">
                         <span class="l2-only">Explaining Findings</span>
                         <span class="l3-only">Critical Spatial Analysis</span> 
@@ -587,13 +594,13 @@
                     </h2>
                 </div>
 
-                <div class="requires-lock-warning bg-amber-50 border border-amber-200 p-10 rounded-2xl text-center shadow-sm max-w-2xl mx-auto w-full">
+                <div class="requires-lock-warning bg-amber-50 border border-amber-200 p-10 rounded-2xl text-center shadow-sm max-w-2xl mx-auto">
                     <i data-lucide="lock" class="w-16 h-16 mx-auto mb-4 text-amber-500"></i>
                     <h3 class="font-bold text-amber-900 text-2xl mb-2">Topic Not Locked</h3>
                     <p class="text-amber-800 text-base">Please establish your core spatial aim parameters to populate the analysis helper utilities.</p>
                 </div>
 
-                <div class="grid lg:grid-cols-12 gap-8 content-requires-lock w-full">
+                <div class="grid lg:grid-cols-12 gap-8 content-requires-lock">
                     <div class="lg:col-span-6 xl:col-span-7 space-y-6">
 
                         <div class="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-xl shadow-sm border-t border-r border-b border-slate-200">
@@ -653,27 +660,25 @@
                             </div>
                         </div>
 
-                        <!-- Sentence Starters - Analysis -->
-                        <div class="glass-card bg-sky-50 border-t-4 border-sky-400">
-                            <h3 class="font-serif font-bold text-sky-900 text-lg mb-4 flex items-center gap-2"><i data-lucide="pen-tool" class="w-5 h-5 text-sky-600"></i> Excellence Sentence Starters</h3>
-                            <p class="text-xs text-sky-800 mb-4">Click to instantly insert these templates into your draft.</p>
-                            <div class="space-y-2">
-                                <button type="button" onclick="insertStarter('editor-analysis', 'While the overarching pattern demonstrates a clear [pattern type] effect, a significant spatial anomaly occurs at [Location]. This irregularity breaks the trend because of the localised factor of [Reason]...')" class="insert-starter-btn w-full text-left bg-white border border-sky-200 p-3 rounded-lg text-sm text-slate-700 shadow-sm hover:border-sky-400">
-                                    "While the overarching pattern demonstrates a clear..."
-                                </button>
-                                <button type="button" onclick="insertStarter('editor-analysis', 'The primary geographic concept evident in this data is [Concept], which is demonstrated by the strong correlation between [Variable A] and [Variable B] at site [X]...')" class="insert-starter-btn w-full text-left bg-white border border-sky-200 p-3 rounded-lg text-sm text-slate-700 shadow-sm hover:border-sky-400">
-                                    "The primary geographic concept evident is..."
-                                </button>
-                                <button type="button" onclick="insertStarter('editor-analysis', 'Data collected from [Method] contradicts the expected environmental pattern, revealing that [Unexpected finding]. This suggests that [Alternative factor] has a stronger influence...')" class="insert-starter-btn w-full text-left bg-white border border-sky-200 p-3 rounded-lg text-sm text-slate-700 shadow-sm hover:border-sky-400">
-                                    "Data collected from [Method] contradicts the expected..."
-                                </button>
+                        <!-- FEATURE 5: Excellence Word Bank (Analysis) -->
+                        <div class="glass-card bg-slate-50 border-t-4 border-indigo-500 mt-6">
+                            <h3 class="font-serif font-bold text-slate-900 text-lg mb-4 flex items-center gap-2"><i data-lucide="type" class="w-5 h-5 text-indigo-600"></i> Excellence Vocabulary</h3>
+                            <p class="text-xs text-slate-500 mb-4">Click any word to insert it directly into your draft. Hover for definition.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <button type="button" title="Clustered around a central point" onclick="insertText('analysis', 'Nucleated')" class="concept-tag">Nucleated</button>
+                                <button type="button" title="Spread out over a large area" onclick="insertText('analysis', 'Dispersed')" class="concept-tag">Dispersed</button>
+                                <button type="button" title="Moving or directed outward from the center" onclick="insertText('analysis', 'Centrifugal')" class="concept-tag">Centrifugal</button>
+                                <button type="button" title="A mutual relationship or connection between two or more things" onclick="insertText('analysis', 'Correlation')" class="concept-tag">Correlation</button>
+                                <button type="button" title="Fairness in the distribution of resources/impacts across space" onclick="insertText('analysis', 'Spatial Equity')" class="concept-tag">Spatial Equity</button>
+                                <button type="button" title="Variation over time" onclick="insertText('analysis', 'Temporal Variation')" class="concept-tag">Temporal Variation</button>
                             </div>
                         </div>
+
                     </div>
 
                     <!-- Right Column (Sticky Editor) -->
-                    <div class="lg:col-span-6 xl:col-span-5 content-requires-lock w-full max-w-full">
-                        <div class="sticky top-24 flex flex-col shadow-lg rounded-xl mb-12 w-full">
+                    <div class="lg:col-span-6 xl:col-span-5 content-requires-lock">
+                        <div class="sticky top-24 flex flex-col shadow-lg rounded-xl mb-12">
                             
                             <!-- Video Embedding -->
                             <div class="bg-slate-900 rounded-t-xl p-4 flex justify-between items-center text-white border-b border-slate-700">
@@ -684,13 +689,19 @@
                             <div class="bg-sky-600 text-white border border-sky-700 p-4 flex justify-between items-center shadow-sm">
                                 <span class="font-bold text-sm flex items-center gap-2"><i data-lucide="edit-3" class="w-4 h-4 text-white"></i> Draft <span class="l2-only">Findings</span><span class="l3-only">Analysis</span></span>
                             </div>
-                            <div class="bg-sky-50 border-x border-slate-300 p-4 text-xs text-slate-700 font-medium border-b border-sky-100 leading-relaxed">
-                                <strong>1. Pattern:</strong> State the overarching trend clearly.<br>
-                                <strong>2. Evidence:</strong> Follow instantly with 2-3 hard metrics from graphs.<br>
-                                <strong>3. Explain & Concept:</strong> State <em>why</em> this occurred using a concept.<br>
-                                <span class="l3-only text-amber-700"><strong>4. Anomaly:</strong> Prove where the trend breaks and explain the local factor causing it.</span>
+                            
+                            <!-- FEATURE 1: Excellence Sentence Starters -->
+                            <div class="bg-sky-100 p-2 border-x border-slate-300 flex gap-2 overflow-x-auto text-xs whitespace-nowrap">
+                                <button type="button" onclick="insertText('analysis', 'While the overarching pattern demonstrates a clear distance-decay effect, a significant spatial anomaly occurs at [Location]. This irregularity breaks the trend because of the localised factor of [Reason]...')" class="bg-white border border-sky-300 px-3 py-1.5 rounded hover:bg-sky-50 font-medium shadow-sm transition">Insert: Anomaly Frame</button>
+                                <button type="button" onclick="insertText('analysis', 'The data exhibits a strong positive correlation between [Variable A] and [Variable B], confirming that...')" class="bg-white border border-sky-300 px-3 py-1.5 rounded hover:bg-sky-50 font-medium shadow-sm transition">Insert: Correlation Frame</button>
                             </div>
-                            <div id="editor-analysis" class="bg-white"></div>
+
+                            <div id="editor-analysis" class="bg-white rounded-none"></div>
+
+                            <!-- FEATURE 6: Be the Moderator -->
+                            <div class="bg-white border-x border-b border-slate-300 rounded-b-xl p-3 flex justify-end shadow-sm">
+                                <button type="button" onclick="openModeratorModal('analysis')" class="bg-slate-800 text-white px-4 py-2 rounded shadow-sm text-sm font-bold flex items-center gap-2 hover:bg-slate-900 transition"><i data-lucide="user-check" class="w-4 h-4"></i> Be The Moderator (Self-Check)</button>
+                            </div>
                             
                             <div class="glass-card border-t-4 border-amber-500 mt-4 rounded-xl p-4">
                                 <div class="flex justify-between items-center mb-3 border-b pb-2">
@@ -709,9 +720,9 @@
             </div>
 
             <!-- ================= VIEW 6: CONCLUSION ================= -->
-            <div id="view-conclusion" class="view-section hidden animate-in fade-in duration-500 space-y-8 w-full max-w-5xl">
+            <div id="view-conclusion" class="view-section hidden animate-in fade-in duration-500 space-y-8">
                 
-                <div class="bg-white border-l-4 border-fuchsia-500 p-6 rounded-r-xl shadow-sm mb-6 max-w-4xl mx-auto w-full">
+                <div class="bg-white border-l-4 border-fuchsia-500 p-6 rounded-r-xl shadow-sm mb-6 max-w-4xl mx-auto">
                     <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2"><i data-lucide="clipboard-list" class="w-5 h-5 text-fuchsia-500"></i> Task Requirements: Conclusion</h3>
                     <ul class="text-sm text-slate-700 space-y-1 list-disc list-inside">
                         <li>Write paragraphs to summarise your findings.</li>
@@ -720,18 +731,18 @@
                     </ul>
                 </div>
 
-                <div class="text-center max-w-3xl mx-auto mb-8 w-full">
+                <div class="text-center max-w-3xl mx-auto mb-8">
                     <h2 class="text-3xl font-serif font-bold text-slate-900 mb-2">Drawing Conclusions</h2>
                     <p class="text-slate-600">Explicitly answer your research aim backed up by summary data.</p>
                 </div>
 
-                <div class="requires-lock-warning bg-amber-50 border border-amber-200 p-8 rounded-xl text-center shadow-sm max-w-2xl mx-auto w-full">
+                <div class="requires-lock-warning bg-amber-50 border border-amber-200 p-8 rounded-xl text-center shadow-sm max-w-2xl mx-auto">
                     <i data-lucide="lock" class="w-12 h-12 mx-auto mb-3 text-amber-500"></i>
                     <h3 class="font-bold text-amber-900 text-xl mb-1">Topic Not Locked</h3>
                     <p class="text-amber-800 text-sm">Please navigate to the <strong>Aim</strong> tab and establish a topic.</p>
                 </div>
 
-                <div class="grid lg:grid-cols-12 gap-8 content-requires-lock w-full">
+                <div class="grid lg:grid-cols-12 gap-8 content-requires-lock">
                     <div class="lg:col-span-6 xl:col-span-7 space-y-6">
                         <div class="glass-card border-t-4 border-fuchsia-500 bg-white">
                             <h3 class="font-serif font-bold text-slate-900 mb-5 text-lg border-b pb-2">Conclusion Blueprint</h3>
@@ -772,8 +783,8 @@
                         </div>
                     </div>
 
-                    <div class="lg:col-span-6 xl:col-span-5 content-requires-lock w-full max-w-full">
-                        <div class="sticky top-24 flex flex-col shadow-lg rounded-xl mb-12 w-full">
+                    <div class="lg:col-span-6 xl:col-span-5 content-requires-lock">
+                        <div class="sticky top-24 flex flex-col shadow-lg rounded-xl mb-12">
                             <div class="bg-fuchsia-600 text-white border border-fuchsia-700 rounded-t-xl p-4 flex justify-between items-center shadow-sm">
                                 <span class="font-bold text-sm flex items-center gap-2"><i data-lucide="edit-3" class="w-4 h-4 text-white"></i> Draft Conclusion</span>
                             </div>
@@ -788,9 +799,9 @@
             </div>
 
             <!-- ================= VIEW 7: EVALUATION ================= -->
-            <div id="view-evaluation" class="view-section hidden animate-in fade-in duration-500 space-y-8 w-full max-w-5xl">
+            <div id="view-evaluation" class="view-section hidden animate-in fade-in duration-500 space-y-8">
                 
-                <div class="bg-white border-l-4 border-rose-500 p-6 rounded-r-xl shadow-sm mb-6 max-w-4xl mx-auto w-full">
+                <div class="bg-white border-l-4 border-rose-500 p-6 rounded-r-xl shadow-sm mb-6 max-w-4xl mx-auto">
                     <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2"><i data-lucide="clipboard-list" class="w-5 h-5 text-rose-500"></i> Task Requirements: Evaluation</h3>
                     <ul class="text-sm text-slate-700 space-y-1 list-disc list-inside">
                         <li>Examine the strengths and weaknesses of your research process.</li>
@@ -802,7 +813,7 @@
                     </ul>
                 </div>
 
-                <div class="text-center max-w-3xl mx-auto mb-8 w-full">
+                <div class="text-center max-w-3xl mx-auto mb-8">
                     <h2 class="text-3xl font-serif font-bold text-slate-900 mb-2">Critical Evaluation <span class="excellence-badge align-middle">E</span></h2>
                     <p class="text-slate-600 text-sm">
                         <span class="l2-only">Fully explain the strength(s) and weakness(es) of your research process. Discuss how these impact the validity of your findings and suggest ways to improve.</span>
@@ -810,13 +821,13 @@
                     </p>
                 </div>
 
-                <div class="requires-lock-warning bg-amber-50 border border-amber-200 p-8 rounded-xl text-center shadow-sm max-w-2xl mx-auto w-full">
+                <div class="requires-lock-warning bg-amber-50 border border-amber-200 p-8 rounded-xl text-center shadow-sm max-w-2xl mx-auto">
                     <i data-lucide="lock" class="w-12 h-12 mx-auto mb-3 text-amber-500"></i>
                     <h3 class="font-bold text-amber-900 text-xl mb-1">Topic Not Locked</h3>
                     <p class="text-amber-800 text-sm">Please navigate to the <strong>Aim</strong> tab and establish a topic.</p>
                 </div>
 
-                <div class="grid lg:grid-cols-12 gap-8 content-requires-lock w-full">
+                <div class="grid lg:grid-cols-12 gap-8 content-requires-lock">
                     <div class="lg:col-span-6 xl:col-span-7 space-y-6">
                         <div class="glass-card border-t-4 border-rose-500 bg-slate-50">
                             <h3 class="font-serif font-bold text-slate-900 mb-4 text-lg border-b border-slate-200 pb-2">Evaluation Framework</h3>
@@ -867,20 +878,16 @@
                             </div>
                         </div>
 
-                        <!-- Sentence Starters - Evaluation -->
-                        <div class="glass-card bg-rose-50 border-t-4 border-rose-400">
-                            <h3 class="font-serif font-bold text-rose-900 text-lg mb-4 flex items-center gap-2"><i data-lucide="pen-tool" class="w-5 h-5 text-rose-600"></i> Excellence Sentence Starters</h3>
-                            <p class="text-xs text-rose-800 mb-4">Click to instantly insert these templates into your draft.</p>
-                            <div class="space-y-2">
-                                <button type="button" onclick="insertStarter('editor-evaluation', 'Because our convenience sampling heavily over-represented [Demographic/Area], it compromised the internal validity of our data. Therefore, our final conclusion that [X happens] is less reliable when applied to the wider environment...')" class="insert-starter-btn w-full text-left bg-white border border-rose-200 p-3 rounded-lg text-sm text-slate-700 shadow-sm hover:border-rose-400">
-                                    "Because our convenience sampling heavily over-represented..."
-                                </button>
-                                <button type="button" onclick="insertStarter('editor-evaluation', 'A significant temporal limitation in our data collection was [Issue]. This skewed our results because [Reason], meaning the pattern observed may only be valid for [Specific Time]...')" class="insert-starter-btn w-full text-left bg-white border border-rose-200 p-3 rounded-lg text-sm text-slate-700 shadow-sm hover:border-rose-400">
-                                    "A significant temporal limitation in our data collection was..."
-                                </button>
-                                <button type="button" onclick="insertStarter('editor-evaluation', 'To mitigate this spatial bias in future, an alternative method would be to [Alternative Method]. Logistically, this would require [Effort], however, it would drastically improve the data quality by [Improvement]...')" class="insert-starter-btn w-full text-left bg-white border border-rose-200 p-3 rounded-lg text-sm text-slate-700 shadow-sm hover:border-rose-400 l3-only">
-                                    "[L3] To mitigate this spatial bias in future, an alternative..."
-                                </button>
+                        <!-- FEATURE 5: Excellence Word Bank (Evaluation) -->
+                        <div class="glass-card bg-slate-50 border-t-4 border-indigo-500 mt-6">
+                            <h3 class="font-serif font-bold text-slate-900 text-lg mb-4 flex items-center gap-2"><i data-lucide="type" class="w-5 h-5 text-indigo-600"></i> Excellence Vocabulary</h3>
+                            <p class="text-xs text-slate-500 mb-4">Click any word to insert it directly into your draft. Hover for definition.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <button type="button" title="When data leans heavily in one direction due to personal opinions" onclick="insertText('evaluation', 'Subjective Bias')" class="concept-tag">Subjective Bias</button>
+                                <button type="button" title="Does your data accurately measure what it claims to measure?" onclick="insertText('evaluation', 'Internal Validity')" class="concept-tag">Internal Validity</button>
+                                <button type="button" title="Does your sample accurately reflect the wider target population?" onclick="insertText('evaluation', 'Representativeness')" class="concept-tag">Representativeness</button>
+                                <button type="button" title="When data is skewed because it was collected at a specific/limited time" onclick="insertText('evaluation', 'Temporal Bias')" class="concept-tag">Temporal Bias</button>
+                                <button type="button" title="A method of dividing the population into subgroups before sampling" onclick="insertText('evaluation', 'Stratified Sampling')" class="concept-tag">Stratified Sampling</button>
                             </div>
                         </div>
 
@@ -896,15 +903,26 @@
                         </div>
                     </div>
 
-                    <div class="lg:col-span-6 xl:col-span-5 content-requires-lock w-full max-w-full">
-                        <div class="sticky top-24 flex flex-col shadow-lg rounded-xl mb-12 w-full">
+                    <div class="lg:col-span-6 xl:col-span-5 content-requires-lock">
+                        <div class="sticky top-24 flex flex-col shadow-lg rounded-xl mb-12">
                             <div class="bg-rose-600 text-white border border-rose-700 rounded-t-xl p-4 flex justify-between items-center shadow-sm">
                                 <span class="font-bold text-sm flex items-center gap-2"><i data-lucide="edit-3" class="w-4 h-4 text-white"></i> Draft Evaluation</span>
                             </div>
-                            <div class="bg-rose-50 border-x border-slate-300 p-3 text-xs text-slate-700 font-medium border-b border-rose-100">
-                                <strong>Tip:</strong> You MUST explicitly use the word "Validity" to describe how your flaw impacted your overall results.
+                            
+                            <!-- FEATURE 3: So What? Template / Starters -->
+                            <div class="bg-rose-100 p-2 border-x border-slate-300 flex gap-2 overflow-x-auto text-xs whitespace-nowrap">
+                                <button type="button" onclick="insertText('evaluation', 'The Flaw: [What went wrong?]\n\nThe Data Skew: [How did this specifically skew or bias the numbers you collected?]\n\nThe Validity Impact: [Therefore, why is your final conclusion less trustworthy?]')" class="bg-white border border-rose-400 px-3 py-1.5 rounded hover:bg-rose-50 font-bold text-rose-800 shadow-sm transition">Insert: 3-Part "So What?" Template</button>
+                                <button type="button" onclick="insertText('evaluation', 'Because our convenience sampling heavily over-represented [Demographic], it compromised the internal validity of our data. Therefore, our final conclusion that [X happens] is less reliable when applied to the wider population...')" class="bg-white border border-rose-300 px-3 py-1.5 rounded hover:bg-rose-50 font-medium shadow-sm transition">Insert: Validity Frame</button>
+                                <button class="l3-only bg-white border border-rose-300 px-3 py-1.5 rounded hover:bg-rose-50 font-medium shadow-sm transition" type="button" onclick="insertText('evaluation', 'To mitigate this temporal bias in future, an alternative method would be to [Method]. The logistical implication of this would be [X], however, it would drastically improve the data quality by [Y]...')">Insert: Alt Methods Frame</button>
                             </div>
-                            <div id="editor-evaluation" class="bg-white"></div>
+
+                            <div id="editor-evaluation" class="bg-white rounded-none"></div>
+
+                            <!-- FEATURE 6: Be the Moderator -->
+                            <div class="bg-white border-x border-b border-slate-300 rounded-b-xl p-3 flex justify-end shadow-sm">
+                                <button type="button" onclick="openModeratorModal('evaluation')" class="bg-slate-800 text-white px-4 py-2 rounded shadow-sm text-sm font-bold flex items-center gap-2 hover:bg-slate-900 transition"><i data-lucide="user-check" class="w-4 h-4"></i> Be The Moderator (Self-Check)</button>
+                            </div>
+
                         </div>
                     </div>
 
@@ -912,19 +930,19 @@
             </div>
 
             <!-- ================= VIEW 8: FINAL PRESENTATION ================= -->
-            <div id="view-final" class="view-section hidden animate-in fade-in duration-500 space-y-8 w-full max-w-5xl">
-                <div class="text-center max-w-3xl mx-auto mb-10 w-full">
+            <div id="view-final" class="view-section hidden animate-in fade-in duration-500 space-y-8">
+                <div class="text-center max-w-3xl mx-auto mb-10">
                     <h2 class="text-3xl font-serif font-bold text-slate-900 mb-4">Final Presentation Assembly</h2>
                     <p class="text-lg text-slate-600">Your research must be compiled into a logical, professional format. Seamlessly integrating your text and visuals is critical for an <strong class="text-amber-600">Excellence</strong> grade.</p>
                 </div>
 
-                <div class="requires-lock-warning bg-amber-50 border border-amber-200 p-10 rounded-2xl text-center shadow-sm max-w-2xl mx-auto w-full">
+                <div class="requires-lock-warning bg-amber-50 border border-amber-200 p-10 rounded-2xl text-center shadow-sm max-w-2xl mx-auto">
                     <i data-lucide="lock" class="w-16 h-16 mx-auto mb-4 text-amber-500"></i>
                     <h3 class="font-bold text-amber-900 text-2xl mb-2">Topic Not Locked</h3>
                     <p class="text-amber-800 text-base">Please establish your core topic lock to view final presentation layouts.</p>
                 </div>
 
-                <div class="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto content-requires-lock w-full">
+                <div class="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto content-requires-lock">
                     <div class="space-y-6">
                         <div class="glass-card border-t-4 border-slate-600">
                             <h3 class="text-xl font-serif font-bold text-slate-900 mb-5 flex items-center gap-2"><i data-lucide="layout" class="w-5 h-5 text-slate-600"></i> Report Integration</h3>
@@ -958,13 +976,13 @@
             </div>
 
             <!-- ================= VIEW 9: NZQA EXEMPLARS ================= -->
-            <div id="view-nzqa" class="view-section hidden animate-in fade-in duration-500 w-full max-w-5xl">
-                <div class="text-center max-w-3xl mx-auto mb-8 w-full">
+            <div id="view-nzqa" class="view-section hidden animate-in fade-in duration-500">
+                <div class="text-center max-w-3xl mx-auto mb-8">
                     <h2 class="text-3xl font-serif font-bold text-slate-900 mb-4">Official NZQA Exemplars</h2>
                     <p class="text-lg text-slate-600">Review past student portfolios officially graded by NZQA moderators.</p>
                 </div>
 
-                <div class="max-w-2xl mx-auto glass-card border-t-4 border-t-slate-500 shadow-lg text-center p-10 w-full">
+                <div class="max-w-2xl mx-auto glass-card border-t-4 border-t-slate-500 shadow-lg text-center p-10">
                     <i data-lucide="book-open" class="w-16 h-16 mx-auto mb-4 text-slate-400"></i>
                     <h3 class="text-2xl font-serif font-bold text-slate-800 mb-4">Past Student Submissions</h3>
                     <p class="text-slate-600 mb-8">Click below to open the official NZQA portal and review authentic 'Excellence' graded research assessments.</p>
@@ -997,6 +1015,26 @@
                 <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
                     <button type="button" onclick="closeAimModal()" class="px-5 py-2.5 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg font-bold text-sm transition">Edit Aim</button>
                     <button type="button" id="btn-modal-lock" onclick="lockTopicFromModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition flex items-center gap-2 hidden">Lock In Topic</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Moderator Self Check Modal -->
+    <div id="moderator-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="p-6 text-white bg-slate-800 flex items-center gap-3">
+                <i data-lucide="user-check" class="w-6 h-6"></i>
+                <h3 class="text-xl font-bold">Excellence Self-Check</h3>
+            </div>
+            <div class="p-8">
+                <p class="text-sm text-slate-700 mb-4 font-bold">You must verify you have met the NCEA criteria before proceeding:</p>
+                <div id="moderator-checklist" class="space-y-3 mb-6 text-sm font-medium text-slate-700">
+                    <!-- Dynamic checkboxes populated by JS -->
+                </div>
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+                    <button type="button" onclick="closeModeratorModal()" class="px-5 py-2.5 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg font-bold text-sm transition">Back to Editing</button>
+                    <button type="button" onclick="submitToAI()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition flex items-center gap-2"><i data-lucide="send" class="w-4 h-4"></i> Send to AI Mentor</button>
                 </div>
             </div>
         </div>
@@ -1083,6 +1121,18 @@
                     <div class="flex-grow"><strong class="block text-sm text-slate-800">NotebookLM Hub</strong></div>
                 </a>
 
+                <!-- FEATURE 4: Waiheke Data Hub -->
+                <div class="border-t border-slate-200 my-1"></div>
+                <p class="text-xs text-slate-600 font-bold uppercase tracking-widest">Waiheke Data Hub</p>
+                <a href="https://geomapspublic.aucklandcouncil.govt.nz/viewer/" target="_blank" class="flex items-center gap-3 bg-white p-3 rounded-lg border border-slate-200 shadow-sm hover:border-teal-400 transition group">
+                    <div class="bg-teal-100 text-teal-600 p-2 rounded group-hover:bg-teal-600 group-hover:text-white transition">🗺️</div>
+                    <div class="flex-grow"><strong class="block text-xs text-slate-800">Auckland Council GeoMaps</strong></div>
+                </a>
+                <a href="https://www.stats.govt.nz/" target="_blank" class="flex items-center gap-3 bg-white p-3 rounded-lg border border-slate-200 shadow-sm hover:border-teal-400 transition group">
+                    <div class="bg-teal-100 text-teal-600 p-2 rounded group-hover:bg-teal-600 group-hover:text-white transition">📈</div>
+                    <div class="flex-grow"><strong class="block text-xs text-slate-800">Stats NZ Meshblocks</strong></div>
+                </a>
+
                 <div class="border-t border-slate-200 my-1"></div>
                 <p class="text-xs text-slate-600 font-bold uppercase tracking-widest">Video Guides & Models</p>
 
@@ -1149,19 +1199,7 @@
             if (appState.currentId) {
                 enterWorkspace(appState.currentId);
             } else {
-                // If no project exists, auto-create one for this single-page app version
-                if (appState.projects.length === 0) {
-                    const newId = Date.now();
-                    const newProject = {
-                        id: newId, topic: "", level: 3, isLocked: false, lastEdited: newId,
-                        drafts: { plan: "", data: "", analysis: "", conclusion: "", evaluation: "" },
-                        checklist: {} 
-                    };
-                    appState.projects.push(newProject);
-                    appState.currentId = newId;
-                    saveState();
-                }
-                enterWorkspace(appState.projects[0].id);
+                renderDashboard();
             }
         };
 
@@ -1239,38 +1277,23 @@
                 }
             });
         }
-        
-        function insertStarter(editorId, text) {
-            const key = editorId.replace('editor-', '');
-            const editor = editors[key];
-            if (!editor) return;
-            
-            // Get the current length to append at the end
-            const length = editor.getLength();
-            
-            // Insert the text with a new line if it's not empty
-            if (length > 1) {
-                editor.insertText(length, '\n' + text + ' ', 'api');
-            } else {
-                editor.insertText(length - 1, text + ' ', 'api');
-            }
-            
-            // Optional: flash the editor border to indicate success
-            const container = document.getElementById(editorId);
-            if (container) {
-                container.style.transition = 'border-color 0.2s, box-shadow 0.2s';
-                const originalBorder = container.style.borderColor;
-                const originalShadow = container.style.boxShadow;
+
+        // FEATURE 1, 3, & 5: Direct Insert Function
+        function insertText(editorKey, text) {
+            const editor = editors[editorKey];
+            if(editor) {
+                const range = editor.getSelection(true);
+                editor.insertText(range.index, text + '\n');
+                editor.setSelection(range.index + text.length + 1);
                 
-                container.style.borderColor = '#10b981'; // emerald-500
-                container.style.boxShadow = '0 0 0 2px rgba(16, 185, 129, 0.2)';
-                
+                // Visual feedback
+                const container = document.getElementById(`editor-${editorKey}`);
+                container.style.transition = 'background-color 0.2s';
+                container.style.backgroundColor = '#d1fae5'; // flash green
                 setTimeout(() => {
-                    container.style.borderColor = originalBorder;
-                    container.style.boxShadow = originalShadow;
-                }, 500);
+                    container.style.backgroundColor = 'white';
+                }, 300);
             }
-            showNotification('Template inserted into draft!', 'success');
         }
 
         function loadState() {
@@ -1285,11 +1308,74 @@
             catch (e) { console.error("Localstorage full or disabled."); }
         }
 
+        function renderDashboard() {
+            const dash = document.getElementById('view-dashboard');
+            if(dash) {
+                dash.classList.remove('hidden');
+                dash.classList.add('flex');
+            }
+            document.getElementById('view-workspace').classList.add('hidden');
+            
+            const container = document.getElementById('project-list-container');
+            if(container) {
+                const cards = container.querySelectorAll('.project-card');
+                cards.forEach(c => c.remove());
+
+                appState.projects.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = "project-card bg-white rounded-xl p-6 shadow-lg flex flex-col justify-between cursor-pointer hover:shadow-xl hover:-translate-y-1 transition border border-slate-200 min-h-[220px]";
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="text-xs font-bold px-2 py-1 rounded bg-blue-100 text-blue-800">Level ${p.level}</span>
+                                <button type="button" onclick="event.stopPropagation(); deleteProject(${p.id})" class="text-slate-400 hover:text-red-500 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+                            <h3 class="font-serif font-bold text-slate-800 text-lg line-clamp-2">${p.topic || 'Untitled Project'}</h3>
+                            <p class="text-xs text-slate-500 mt-2">Last edited: ${new Date(p.lastEdited).toLocaleDateString()}</p>
+                        </div>
+                        <button type="button" class="mt-4 w-full bg-slate-800 text-white font-bold text-sm py-2 rounded-lg hover:bg-slate-900 transition flex justify-center items-center gap-2"><i data-lucide="folder-open" class="w-4 h-4"></i> Open Project</button>
+                    `;
+                    card.onclick = () => enterWorkspace(p.id);
+                    container.appendChild(card);
+                });
+                if (typeof lucide !== 'undefined') lucide.createIcons({root: container});
+            } else {
+                // If dashboard is completely gone, just force into a project
+                if (appState.projects.length === 0) {
+                    openNewProjectModal();
+                } else {
+                    enterWorkspace(appState.projects[0].id);
+                }
+            }
+        }
+
+        function openNewProjectModal() {
+            const newId = Date.now();
+            const newProject = {
+                id: newId, topic: "", level: 3, isLocked: false, lastEdited: newId,
+                drafts: { plan: "", data: "", analysis: "", conclusion: "", evaluation: "" },
+                checklist: {} 
+            };
+            appState.projects.push(newProject);
+            appState.currentId = newId;
+            saveState();
+            enterWorkspace(newId);
+        }
+
+        function deleteProject(id) {
+            if(confirm("Are you sure you want to delete this project?")) {
+                appState.projects = appState.projects.filter(p => p.id !== id);
+                if(appState.currentId === id) appState.currentId = null;
+                saveState();
+                renderDashboard();
+            }
+        }
+
         function enterWorkspace(id) {
             appState.currentId = id;
             saveState();
             const project = appState.projects.find(p => p.id === id);
-            if (!project) return;
+            if (!project) return renderDashboard();
 
             currentLevel = project.level; currentTopic = project.topic; isTopicLocked = project.isLocked;
 
@@ -1303,7 +1389,16 @@
                 box.checked = project.checklist ? project.checklist[index] === true : false;
             });
 
+            const dash = document.getElementById('view-dashboard');
+            if(dash) { dash.classList.add('hidden'); dash.classList.remove('flex'); }
+            document.getElementById('view-workspace').classList.remove('hidden');
+            
             document.getElementById('draft-topic').value = currentTopic;
+            
+            const titleEl = document.getElementById('workspace-project-title');
+            if (titleEl) {
+                titleEl.innerText = currentTopic ? currentTopic.substring(0, 40) + (currentTopic.length > 40 ? '...' : '') : 'New Investigation';
+            }
             
             setLevel(currentLevel);
             if (isTopicLocked) lockTopicUI();
@@ -1314,6 +1409,11 @@
             updateProgress();
             
             setTimeout(() => { renderSpecificChart(); updateMapDisplay(); updateVisualDisplay(); }, 200);
+        }
+
+        function returnToDashboard() {
+            saveCurrentProject();
+            renderDashboard();
         }
 
         function saveCurrentProject() {
@@ -1382,7 +1482,7 @@
                 const navAn = document.getElementById('nav-analysis');
                 if(navAn) navAn.innerHTML = `<i data-lucide="circle" class="w-4 h-4 transition-colors text-slate-400" id="icon-analysis"></i> Findings`;
             } else {
-                if(b3) b3.className = "px-4 py-1.5 rounded font-bold text-xs bg-white text-[var(--whs-dark)] shadow-sm transition border border-transparent";
+                if(b3) b3.className = "px-4 py-1.5 rounded font-bold text-xs bg-white text-blue-600 shadow-sm transition border border-blue-200";
                 if(b2) b2.className = "px-4 py-1.5 rounded font-bold text-xs text-white/70 hover:text-white transition border border-transparent";
                 const sub = document.getElementById('header-subtitle');
                 if(sub) sub.innerText = "Conduct Geographic Research (3.5)";
@@ -1439,6 +1539,11 @@
             currentTopic = document.getElementById('draft-topic').value.trim();
             if(!currentTopic) return;
             isTopicLocked = true;
+            
+            const titleEl = document.getElementById('workspace-project-title');
+            if(titleEl) {
+                titleEl.innerText = currentTopic.substring(0, 40) + (currentTopic.length > 40 ? '...' : '');
+            }
             
             saveCurrentProject(); 
             lockTopicUI();
@@ -1506,7 +1611,6 @@
 
             document.body.className = document.body.className.replace(/bg-theme-\w+/g, '');
             document.body.classList.add(`bg-theme-${viewId}`);
-            updateLockState();
 
             if (viewId === 'presentation') {
                 setTimeout(() => { 
@@ -1748,6 +1852,16 @@
                 ctx.fillText("1990 Aerial", 150, 125); ctx.fillText("2024 Land Use", 350, 125);
                 desc = "↔️ **GIS Slide/Swipe Map:** An interactive GIS presentation method. Allows users to slide a vertical bar back and forth to directly compare two overlapping datasets (e.g., historical aerial imagery vs. modern land use).";
             }
+            else if (selectValue === 'time_distance') {
+                ctx.strokeStyle = currentLevel === 3 ? '#2563eb' : '#0d9488'; ctx.fillStyle = currentLevel === 3 ? "rgba(37, 99, 235, 0.1)" : "rgba(13, 148, 136, 0.1)"; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(250, 120, 100, 0, Math.PI*2); ctx.fill(); ctx.stroke(); // 15 min
+                ctx.beginPath(); ctx.arc(250, 120, 60, 0, Math.PI*2); ctx.fill(); ctx.stroke(); // 10 min
+                ctx.beginPath(); ctx.arc(250, 120, 25, 0, Math.PI*2); ctx.fill(); ctx.stroke(); // 5 min
+                ctx.fillStyle = "#ef4444"; ctx.beginPath(); ctx.arc(250, 120, 5, 0, Math.PI*2); ctx.fill(); // Node
+                ctx.fillStyle = "#1e293b"; ctx.font = "10px sans-serif"; ctx.textAlign = "center";
+                ctx.fillText("5m Isochrone", 250, 90); ctx.fillText("10m Isochrone", 250, 55); ctx.fillText("15m Isochrone", 250, 15);
+                desc = "⏱️ **Time/Distance Maps (Isochrones):** Shows areas of equal travel time or physical distance from a central node via concentric irregular rings. Excellent for showing accessibility to services like retail nodes or public transport hubs.";
+            }
             
             if(selectValue !== 'swipe') {
                 ctx.fillStyle = "#1e293b"; ctx.font = "10px sans-serif"; ctx.textAlign = "right";
@@ -1782,6 +1896,48 @@
         function toggleMentor() {
             const p = document.getElementById('mentor-panel');
             if(p) p.classList.toggle('show');
+        }
+
+        // FEATURE 6: Moderator Validation Flow
+        function openModeratorModal(type) {
+            const checklist = document.getElementById('moderator-checklist');
+            if(type === 'analysis') {
+                checklist.innerHTML = `
+                    <label class="flex items-start gap-3 p-2 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer"><input type="checkbox" class="mt-1 w-4 h-4 accent-emerald-500"> Yes, I have explicitly stated the overarching spatial pattern.</label>
+                    <label class="flex items-start gap-3 p-2 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer"><input type="checkbox" class="mt-1 w-4 h-4 accent-emerald-500"> Yes, I have used hard data (numbers/%) to prove it.</label>
+                    <label class="flex items-start gap-3 p-2 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer l3-only"><input type="checkbox" class="mt-1 w-4 h-4 accent-emerald-500"> Yes, I have identified and explained an anomaly.</label>
+                `;
+            } else {
+                checklist.innerHTML = `
+                    <label class="flex items-start gap-3 p-2 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer"><input type="checkbox" class="mt-1 w-4 h-4 accent-emerald-500"> Yes, I have explicitly used the word 'validity' or 'reliability'.</label>
+                    <label class="flex items-start gap-3 p-2 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer"><input type="checkbox" class="mt-1 w-4 h-4 accent-emerald-500"> Yes, I explained how a weakness skewed my specific data.</label>
+                    <label class="flex items-start gap-3 p-2 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer l3-only"><input type="checkbox" class="mt-1 w-4 h-4 accent-emerald-500"> Yes, I suggested an alternative method and discussed its implications.</label>
+                `;
+            }
+            
+            if(currentLevel === 2) {
+                document.querySelectorAll('.l3-only').forEach(e => e.style.display = 'none');
+            } else {
+                document.querySelectorAll('.l3-only').forEach(e => e.style.display = '');
+            }
+
+            document.getElementById('moderator-modal').classList.add('show');
+        }
+
+        function closeModeratorModal() {
+            document.getElementById('moderator-modal').classList.remove('show');
+        }
+
+        function submitToAI() {
+            const boxes = Array.from(document.querySelectorAll('#moderator-checklist input[type="checkbox"]'));
+            const allChecked = boxes.every(b => b.offsetParent === null || b.checked); // Ignore hidden (L3 only) boxes if not applicable
+            
+            if(!allChecked) {
+                showNotification("You must verify all NCEA criteria are present before proceeding.", "error");
+                return;
+            }
+            closeModeratorModal();
+            showNotification("Validation complete. Draft accepted for AI Mentoring.", "success");
         }
     </script>
 </body>
